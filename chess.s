@@ -1,6 +1,6 @@
 # brainstorm:
 # 32 bits to encode each piece
-# info: 
+# info:
 #       - piece type: => 6 pieces => 3 bits total
 #           - knight (001)
 #           - king (010)
@@ -11,8 +11,8 @@
 #       - color of piece: one bit total => 0 = white, 1 = black
 #       - color of square: four bits total => 0001 = BWRG
 #      IF THERE IS NO PIECE AT AN ADDRESS IN DMEM (addr 0-63) : all 1s (-1)
-#   ex: 110     0       : is a white pawn
-#       piece  color
+#   ex: 1000     110     0       : is a white pawn
+#       sqclr    piece  color
 # these pieces will be stored at an address in dmem that represents a position on a board
 # follow drawing for encoding details: chessboard.jpg
 
@@ -49,19 +49,19 @@ move:
     # overwriting dest cell data with curr cell data, checking to see if we took a king by lwing the dest pos
     # then restoreColors
     # display win if necessary
-    
+
 
 findPieceAtPos:
     # inputs:
     #   currColor, x, y
-    # task: 
+    # task:
     #   looks through 32 addresses in dmem to look for a piece at x,y that belongs to currColor
     # outputs:
     #   write these valid moves to each piece square background colors to indicate valid moves
     #   write 28 32-bit writes to dmem. 000...dest_loc if valid move. Else its going to be all 1's (-1).
 
 checkWin:
-    # inputs: 
+    # inputs:
     #   none
     # outputs:
     #   0 == 0, 1, or -1. 0 indicates nobody winning, 1 indicates white wins, -1 indicates black wins
@@ -77,7 +77,7 @@ restoreColors:
     # outputs: none, but write to dmem
 
 findMovesForPiece:
-    # inputs: 
+    # inputs:
     #   32 bit piece
     # outputs:
     #   0-27 == store up to 28 possible moves into memory, storing nulls for the moves that aren't possible
