@@ -1,0 +1,40 @@
+module twobitsignextender(in32, out34);
+	input [31:0] in32;
+	output [33:0] out34;
+	
+	assign out34[33] = in32[31];
+	assign out34[32] = in32[31];
+	assign out34[31] = in32[31];
+	assign out34[30] = in32[30];
+	assign out34[29] = in32[29];
+	assign out34[28] = in32[28];
+	assign out34[27] = in32[27];
+	assign out34[26] = in32[26];
+	assign out34[25] = in32[25];
+	assign out34[24] = in32[24];
+	assign out34[23] = in32[23];
+	assign out34[22] = in32[22];
+	assign out34[21] = in32[21];
+	assign out34[20] = in32[20];
+	assign out34[19] = in32[19];
+	assign out34[18] = in32[18];
+	assign out34[17] = in32[17];
+	assign out34[16] = in32[16];
+	assign out34[15] = in32[15];
+	assign out34[14] = in32[14];
+	assign out34[13] = in32[13];
+	assign out34[12] = in32[12];
+	assign out34[11] = in32[11];
+	assign out34[10] = in32[10];
+	assign out34[9] = in32[9];
+	assign out34[8] = in32[8];
+	assign out34[7] = in32[7];
+	assign out34[6] = in32[6];
+	assign out34[5] = in32[5];
+	assign out34[4] = in32[4];
+	assign out34[3] = in32[3];
+	assign out34[2] = in32[2];
+	assign out34[1] = in32[1];
+	assign out34[0] = in32[0];
+
+endmodule

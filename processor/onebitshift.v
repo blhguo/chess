@@ -1,0 +1,40 @@
+module onebitshift(in34, out34);
+	input [33:0] in34;
+	output [33:0] out34;
+	
+	assign out34[0] = 0;
+	assign out34[1] = in34[0];
+	assign out34[2] = in34[1];
+	assign out34[3] = in34[2];
+	assign out34[4] = in34[3];
+	assign out34[5] = in34[4];
+	assign out34[6] = in34[5];
+	assign out34[7] = in34[6];
+	assign out34[8] = in34[7];
+	assign out34[9] = in34[8];
+	assign out34[10] = in34[9];
+	assign out34[11] = in34[10];
+	assign out34[12] = in34[11];
+	assign out34[13] = in34[12];
+	assign out34[14] = in34[13];
+	assign out34[15] = in34[14];
+	assign out34[16] = in34[15];
+	assign out34[17] = in34[16];
+	assign out34[18] = in34[17];
+	assign out34[19] = in34[18];
+	assign out34[20] = in34[19];
+	assign out34[21] = in34[20];
+	assign out34[22] = in34[21];
+	assign out34[23] = in34[22];
+	assign out34[24] = in34[23];
+	assign out34[25] = in34[24];
+	assign out34[26] = in34[25];
+	assign out34[27] = in34[26];
+	assign out34[28] = in34[27];
+	assign out34[29] = in34[28];
+	assign out34[30] = in34[29];
+	assign out34[31] = in34[30];
+	assign out34[32] = in34[31];
+	assign out34[33] = in34[32];
+ 
+endmodule
