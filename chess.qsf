@@ -53,38 +53,6 @@ set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "VERILOG HDL" -section_id eda_simulation
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name MIF_FILE testGiveMeN.dmem.mif
-set_global_assignment -name VERILOG_FILE white_rook_data.v
-set_global_assignment -name MIF_FILE white_rook_index.mif
-set_global_assignment -name MIF_FILE white_rook_data.mif
-set_global_assignment -name MIF_FILE white_queen_index.mif
-set_global_assignment -name MIF_FILE white_queen_data.mif
-set_global_assignment -name MIF_FILE white_pawn_index.mif
-set_global_assignment -name MIF_FILE white_pawn_data.mif
-set_global_assignment -name MIF_FILE white_knight_index.mif
-set_global_assignment -name MIF_FILE white_knight_data.mif
-set_global_assignment -name MIF_FILE white_king_index.mif
-set_global_assignment -name MIF_FILE white_king_data.mif
-set_global_assignment -name MIF_FILE white_bishop_index.mif
-set_global_assignment -name MIF_FILE white_bishop_data.mif
-set_global_assignment -name MIF_FILE black_rook_index.mif
-set_global_assignment -name MIF_FILE black_rook_data.mif
-set_global_assignment -name MIF_FILE black_queen_index.mif
-set_global_assignment -name MIF_FILE black_queen_data.mif
-set_global_assignment -name MIF_FILE black_pawn_index.mif
-set_global_assignment -name MIF_FILE black_pawn_data.mif
-set_global_assignment -name MIF_FILE black_knight_index.mif
-set_global_assignment -name MIF_FILE black_knight_data.mif
-set_global_assignment -name MIF_FILE black_king_index.mif
-set_global_assignment -name MIF_FILE black_king_data.mif
-set_global_assignment -name MIF_FILE black_bishop_index.mif
-set_global_assignment -name MIF_FILE black_bishop_data.mif
-set_global_assignment -name VERILOG_FILE main.v
-set_global_assignment -name VERILOG_FILE vga_controller.v
-set_global_assignment -name VERILOG_FILE VGA_Audio_PLL.v
-set_global_assignment -name VERILOG_FILE Reset_Delay.v
-set_global_assignment -name QIP_FILE white_rook_index.qip
-set_global_assignment -name QIP_FILE dmem.qip
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
@@ -198,6 +166,38 @@ set_location_assignment PIN_H21 -to leds[4]
 set_location_assignment PIN_G20 -to leds[5]
 set_location_assignment PIN_G22 -to leds[6]
 set_location_assignment PIN_G21 -to leds[7]
+set_global_assignment -name MIF_FILE testGiveMeN.dmem.mif
+set_global_assignment -name VERILOG_FILE white_rook_data.v
+set_global_assignment -name MIF_FILE white_rook_index.mif
+set_global_assignment -name MIF_FILE white_rook_data.mif
+set_global_assignment -name MIF_FILE white_queen_index.mif
+set_global_assignment -name MIF_FILE white_queen_data.mif
+set_global_assignment -name MIF_FILE white_pawn_index.mif
+set_global_assignment -name MIF_FILE white_pawn_data.mif
+set_global_assignment -name MIF_FILE white_knight_index.mif
+set_global_assignment -name MIF_FILE white_knight_data.mif
+set_global_assignment -name MIF_FILE white_king_index.mif
+set_global_assignment -name MIF_FILE white_king_data.mif
+set_global_assignment -name MIF_FILE white_bishop_index.mif
+set_global_assignment -name MIF_FILE white_bishop_data.mif
+set_global_assignment -name MIF_FILE black_rook_index.mif
+set_global_assignment -name MIF_FILE black_rook_data.mif
+set_global_assignment -name MIF_FILE black_queen_index.mif
+set_global_assignment -name MIF_FILE black_queen_data.mif
+set_global_assignment -name MIF_FILE black_pawn_index.mif
+set_global_assignment -name MIF_FILE black_pawn_data.mif
+set_global_assignment -name MIF_FILE black_knight_index.mif
+set_global_assignment -name MIF_FILE black_knight_data.mif
+set_global_assignment -name MIF_FILE black_king_index.mif
+set_global_assignment -name MIF_FILE black_king_data.mif
+set_global_assignment -name MIF_FILE black_bishop_index.mif
+set_global_assignment -name MIF_FILE black_bishop_data.mif
+set_global_assignment -name VERILOG_FILE main.v
+set_global_assignment -name VERILOG_FILE vga_controller.v
+set_global_assignment -name VERILOG_FILE VGA_Audio_PLL.v
+set_global_assignment -name VERILOG_FILE Reset_Delay.v
+set_global_assignment -name QIP_FILE white_rook_index.qip
+set_global_assignment -name QIP_FILE dmem.qip
 set_global_assignment -name QIP_FILE white_rook_data.qip
 set_global_assignment -name VERILOG_FILE white_knight_data.v
 set_global_assignment -name VERILOG_FILE white_king_data.v

@@ -73,11 +73,7 @@ START OF CHESS IMAGES
 
 
 /*
-reg [18:0] ADDR;
-reg [23:0] bgr_data;
-wire VGA_CLK_n;
-wire [7:0] index;
-wire [23:0] bgr_data_raw;
+ADDRESS WIRES
 */
 wire [11:0] addressX, addressY;
 assign addressX = ADDR % 640;
@@ -112,7 +108,9 @@ wire [23:0] bgr_data_raw_wkn,
 				bgr_data_raw_bb,
 				bgr_data_raw_br,
 				bgr_data_raw_bp;
-//possible color indexes
+/*
+POSSIBLE COLOR INDEXES HERE
+*/
 	//white pieces
 white_rook_data	white_rook_data_inst (
 	.address ( imgADDR ),
@@ -178,7 +176,9 @@ black_pawn_data	black_pawn_data_inst (
 	);
 
 	
-//possible color tables
+/*
+POSSIBLE COLOR TABLES HERE
+*/
 //chess pieces
 	//white pieces
 white_rook_index	white_rook_index_inst (
@@ -250,10 +250,10 @@ assign chess_address = dmemAddress;
 
 
 reg [4:0] colorSelector;
-assign bgr_data_raw = colorSelector == 0 ? 23'h000000 : //black
-					colorSelector == 1 ? 23'hEDD5D0 : //white
-					colorSelector == 2 ? 23'hEF330B : //red
-					colorSelector == 3 ? 23'h41B963 : //green
+assign bgr_data_raw = colorSelector == 0 ? 24'h000000 : //black
+					colorSelector == 1 ? 24'hEDD5D0 : //white
+					colorSelector == 2 ? 24'hEF330B : //red
+					colorSelector == 3 ? 24'h41B963 : //green
 					colorSelector == 4 ? bgr_data_raw_wkn : //white knight
 					colorSelector == 5 ? bgr_data_raw_wki : //white king
 					colorSelector == 6 ? bgr_data_raw_wq : //white queen
@@ -261,12 +261,12 @@ assign bgr_data_raw = colorSelector == 0 ? 23'h000000 : //black
 					colorSelector == 8 ? bgr_data_raw_wr : //white rook
 					colorSelector == 9 ? bgr_data_raw_wp : //white pawn
 					colorSelector == 10 ? bgr_data_raw_bkn : //black knight
-					colorSelector == 11 ? bgr_data_raw_bkn : //black king
-					colorSelector == 12 ? bgr_data_raw_bkn : //black queen
-					colorSelector == 13 ? bgr_data_raw_bkn : //black bishop
-					colorSelector == 14 ? bgr_data_raw_bkn : //black rook
-					colorSelector == 15 ? bgr_data_raw_bkn : //black pawn
-					23'h000000;
+					colorSelector == 11 ? bgr_data_raw_bki : //black king
+					colorSelector == 12 ? bgr_data_raw_bq : //black queen
+					colorSelector == 13 ? bgr_data_raw_bb : //black bishop
+					colorSelector == 14 ? bgr_data_raw_br : //black rook
+					colorSelector == 15 ? bgr_data_raw_bp : //black pawn
+					24'h000000;
 					
 
 wire [31:0] dmemData;
@@ -288,21 +288,8 @@ begin
 							dmemAddressY[2], dmemAddressY[1], dmemAddressY[0], 
 							dmemAddressX[2], dmemAddressX[1], dmemAddressX[0]};
 		
-		//figure out the square color
-		if (squareColor[3]) begin //black
-			colorSelector = 0;
-		end
-		else if (squareColor[2]) begin  //white
-			colorSelector = 1;
-		end
-		else if (squareColor[1]) begin  //red
-			colorSelector = 2;
-		end
-		else if (squareColor[0]) begin  //green
-			colorSelector = 3;
-		end
 		
-		//figure out if the piece is equal to -1 (no piece) or not and display pieces based on that
+		//display pieces based on dmem data
 		//white pieces
 		if ( pieceType == 1 && pieceColor == 0 && index_wkn != 0) begin
 			colorSelector = 4;
@@ -324,7 +311,7 @@ begin
 		end
 		
 		//black pieces
-		if ( pieceType == 1 && pieceColor == 1 && index_bkn != 0) begin
+		else if ( pieceType == 1 && pieceColor == 1 && index_bkn != 0) begin
 			colorSelector = 10;
 		end
 		else if ( pieceType == 2 && pieceColor == 1 && index_bki != 0) begin
@@ -341,6 +328,22 @@ begin
 		end
 		else if ( pieceType == 6 && pieceColor == 1 && index_bp != 0) begin
 			colorSelector = 15;
+		end
+		//figure out the square color
+		else	if (squareColor[3]) begin //black
+			colorSelector = 0;
+		end
+		else if (squareColor[2]) begin  //white
+			colorSelector = 1;
+		end
+		else if (squareColor[1]) begin  //red
+			colorSelector = 2;
+		end
+		else if (squareColor[0]) begin  //green
+			colorSelector = 3;
+		end
+		else begin
+			colorSelector = 3;
 		end
 	end
 	else begin
