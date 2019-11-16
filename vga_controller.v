@@ -250,8 +250,8 @@ assign chess_address = dmemAddress;
 
 
 reg [4:0] colorSelector;
-assign bgr_data_raw = colorSelector == 0 ? 24'h000000 : //black
-					colorSelector == 1 ? 24'hEDD5D0 : //white
+assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
+					colorSelector == 1 ? 24'hCDE1F7 : //light brown like not simran
 					colorSelector == 2 ? 24'hEF330B : //red
 					colorSelector == 3 ? 24'h41B963 : //green
 					colorSelector == 4 ? bgr_data_raw_wkn : //white knight
