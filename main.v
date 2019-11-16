@@ -7,7 +7,8 @@ module main(
 	VGA_R,   														//	VGA Red[9:0]
 	VGA_G,	 														//	VGA Green[9:0]
 	VGA_B,															//	VGA Blue[9:0]
-	CLOCK_50);  													// 50 MHz clock
+	CLOCK_50,
+	DEBUG_button_clicked);  													// 50 MHz clock
 		
 	////////////////////////	VGA	////////////////////////////
 	output			VGA_CLK;   				//	VGA Clock
@@ -19,6 +20,10 @@ module main(
 	output	[7:0]	VGA_G;	 				//	VGA Green[9:0]
 	output	[7:0]	VGA_B;   				//	VGA Blue[9:0]
 	input				CLOCK_50;
+	
+	//###############################DEBUG############################//
+	input DEBUG_button_clicked;
+	
 	
 	//#######################################PROCESSOR SKELETON#################################################//
 	 //clock_t, reset, instruction_output, dmem_output, rdval_writeback, regA_out, regB_out, rd_writeback
@@ -50,17 +55,24 @@ module main(
 	 
 	 wire [11:0] chess_address;
 	 wire [31:0] chess_data;
+	 wire [11:0] temp_chess_addr;
 	 
+//	 assign temp_chess_addr = DEBUG_button_clicked ? 12'd8 : chess_address;
+	 
+	 
+	 
+	 wire temp_we;
+	 assign temp_we = chess_address == 36 && DEBUG_button_clicked ? 1'b1 : 1'b0;
 	 dmem_valid my_dmem( //a goes to process, b goes to hardware
 		.address_a(address_dmem),
 		.address_b(chess_address),
 		.clock(~clock),
 		.data_a(data),
-		.data_b(32'd0),
+		.data_b(32'b00000000000000000000000001001001),
 		.wren_a(wren),
-		.wren_b(1'b0),
+		.wren_b(temp_we),
 		.q_a(q_dmem),
-		.q_b(chess_data))
+		.q_b(chess_data));
 	 
 //    dmem my_dmem(
 //        .address    (address_dmem),       // address of data
@@ -126,11 +138,6 @@ module main(
         data_readRegB                   // I: Data from port B of regfile
 	 );
 	 //##########################################END PROCESSOR SKELETON###########################################//
-	//dmem
-	dmem (
-	chess_address,
-	CLOCK_50,
-	chess_data);
 	
 	
 	// VGA

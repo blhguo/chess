@@ -32,7 +32,7 @@
 //authorized distributors.  Please refer to the applicable 
 //agreement for further details.
 
-module white_rook_data (
+module white_rook_data_bb (
 	address,
 	clock,
 	q);

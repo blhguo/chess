@@ -1,40 +1,25 @@
-DEPTH = 4096;
-WIDTH = 32;
-ADDRESS_RADIX = DEC;
-DATA_RADIX = BIN;
-CONTENT
-BEGIN
-0000 : 10101000000000000000000000000010; -- setx 2
+-- Copyright (C) 2017  Intel Corporation. All rights reserved.
+-- Your use of Intel Corporation's design tools, logic functions 
+-- and other software and tools, and its AMPP partner logic 
+-- functions, and any output files from any of the foregoing 
+-- (including device programming or simulation files), and any 
+-- associated documentation or information are expressly subject 
+-- to the terms and conditions of the Intel Program License 
+-- Subscription Agreement, the Intel Quartus Prime License Agreement,
+-- the Intel FPGA IP License Agreement, or other applicable license
+-- agreement, including, without limitation, that your use is for
+-- the sole purpose of programming logic devices manufactured by
+-- Intel and sold by Intel or its authorized distributors.  Please
+-- refer to the applicable agreement for further details.
 
-0001 : 00101000010000000000000000000001; -- addi $1, $0, 1
+-- Quartus Prime generated Memory Initialization File (.mif)
 
-0002 : 00101000100000000000000000000010; -- addi $2, $0, 2
+WIDTH=32;
+DEPTH=4096;
 
-0003 : 00101000110000000000000000000011; -- addi $3, $0, 3
+ADDRESS_RADIX=DEC;
+DATA_RADIX=BIN;
 
-0004 : 00101001000000000000000000000100; -- addi $4, $0, 4
-
-0005 : 00111000010000000000000000000000; -- sw $1, 0($0)
-
-0006 : 00000001010000100010000000000100; -- sub $5, $1, $2
-
-0007 : 00000001100000100010000000001000; -- and $6, $1, $2
-
-0008 : 00000001110000100010000000001100; -- or $7, $1, $2
-
-0009 : 00000010000001100000000010010000; -- sll $8, $3, 1
-
-0010 : 00000010010010000000000010010100; -- sra $9, $4, 1
-
-0011 : 00010000010001000000000000000001; -- bne $1, $2, 1
-
-0012 : 00101000010000100000000000000001; -- addi $1, $1, 1
-
-0013 : 01000010100000000000000000000000; -- lw $10, 0($0)
-
-0014 : 00000000100001000010000000000000; -- add $2, $2, $2
-
-0015 : 00001000000000000000000000001011; -- j 11
-
-[0016..4095] : 00000000000000000000000000000000;
+CONTENT BEGIN
+	[0..4095]  :   00000000000000000000000000000000;
 END;
