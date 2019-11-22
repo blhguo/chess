@@ -147,7 +147,7 @@ handle2InValid:
     #wipe 100-131
     addi $10, $0, -1
     sw $10, 100($0)
-    ...
+
     sw $10, 131($0)
     
     # handle knight
@@ -491,7 +491,6 @@ move:
     bne $10, $2, 1
     j handle_valid
 
-    #load zeroth valid move from dmem102
     lw $10 102($0)
     #compare valid move (y, x) to the dest of playermove (input_2)
     bne $10, $2, 1
