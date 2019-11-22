@@ -113,22 +113,15 @@ j 0
 
 #If $1 is valid and $2 is valid
 bne $20 $0 1
-j handle$2Valid
-j handle$2InValid
+j handle2Valid
+j handle2InValid
 
 j 0
 ##################GAME BIG LOOP ENDS HERE##########################
 
-handle$2Valid:
-    # $1: (yx) of input1, $2: (yx) of input2, $3: cellData_input1 $4: cellData_input2
-    //load arguments into registers
-    
-    //parse start pos (used to address into dmem)
-    
-    //parse end pos (used to address into dmem AND to compare to valid moves)
-    //parse curr cell data (used to overwrite addresses in dmem)
-    
-    'dont think we need this lw'
+handle2Valid:
+    # $1: (yx) of input1, $2: (yx) of input2, $3: cellData_input1 $4: cellData_input2    
+    #'dont think we need this lw'
     lw $4, 0($2)
     
     jal move
@@ -140,9 +133,9 @@ checkWin:
     ####handle2Valid
     #### FLIP THE TURN STATE ONLY WHEN ITS A VALID MOVE
 
-handle$2InValid:
+handle2InValid:
     # $1: (yx) of input1, $3: cellData_input1
-    //load arguments into registers
+    #load arguments into registers
     
     #$11 is going to hold the piece type, unshifted, then we shift it
     #$10 is going to hold the mask
@@ -165,27 +158,27 @@ handle$2InValid:
     # TODO: handle king
     addi $10 $0 2
     bne $11 $10 1
-    j handleKing
+    #j handleKing
     
     # TODO: handle queen
     addi $10 $0 3
     bne $11 $10 1
-    j handleQueen
+    #j handleQueen
     
     # TODO: handle bishop
     addi $10 $0 4
     bne $11 $10 1
-    j handleBishop
+    #j handleBishop
     
     # TODO: handle rook
     addi $10 $0 5
     bne $11 $10 1
-    j handleRook
+    #j handleRook
     
     # TODO: handle pawn
     addi $10 $0 6
     bne $11 $10 1
-    j handlePawn
+    #j handlePawn
     
 
     j 0
@@ -222,6 +215,31 @@ handleKnight:
     sw $10, 0($14)
     # bne lands past here
     
+    ############ $7 = x + 1, $8= y - 2
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, 1
+    addi $8, $8, -2
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    addi $14, $0, 100
+    sw $10, 0($14)
+    
     ############ $7 = x - 1, $8= y + 2
     jal parseXY # parses $1 to make $7=x and $8=y
     addi $7, $7, -1
@@ -246,8 +264,133 @@ handleKnight:
     # write the address for indexing into cell data into address 100 (100 stored in $14)
     addi $14, $0, 100
     sw $10, 0($14)
-    
-    ... # do this for the other 6 cases, all should be same except for the offsets
+
+    ############ $7 = x - 1, $8= y - 2
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, -1
+    addi $8, $8, -2
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    addi $14, $0, 100
+    sw $10, 0($14)
+
+    ############ $7 = x + 2, $8= y + 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, 2
+    addi $8, $8, 1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    addi $14, $0, 100
+    sw $10, 0($14)
+
+    ############ $7 = x + 2, $8= y - 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, 2
+    addi $8, $8, -1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    addi $14, $0, 100
+    sw $10, 0($14)
+
+    ############ $7 = x - 2, $8= y + 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, -2
+    addi $8, $8, 1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    addi $14, $0, 100
+    sw $10, 0($14)
+
+    ############ $7 = x - 2, $8= y - 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, -2
+    addi $8, $8, -1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    addi $14, $0, 100
+    sw $10, 0($14)
+
+    #... # do this for the other 5 cases, all should be same except for the offsets -> DONE :)
     
 
 parseXY:
@@ -335,27 +478,176 @@ move:
     # reset $1 and $2 to be invalid (-1)    
     
     #################CHECK ALL DMEM VALID MOVES COMPARE############
-    ##!!!!!!!!!!!!!!!!!!!!!!!!ADD MORE OF THEM 28!!!!!!!!!!!!!!!!##
+    ##!!!!!!!!!!!!!!!!!!!!!!!!ADD MORE OF THEM 28 -> DONE :)!!!!!!!!!!!!!!!!##    
     #load zeroth valid move from dmem100
     lw $10 100($0)
     #compare valid move (y, x) to the dest of playermove (input_2)
     bne $10, $2, 1
     j handle_valid
-    
+
     #load zeroth valid move from dmem101
     lw $10 101($0)
     #compare valid move (y, x) to the dest of playermove (input_2)
     bne $10, $2, 1
     j handle_valid
-    
+
     #load zeroth valid move from dmem102
     lw $10 102($0)
     #compare valid move (y, x) to the dest of playermove (input_2)
     bne $10, $2, 1
     j handle_valid
+
+    #load zeroth valid move from dmem103
+    lw $10 103($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem104
+    lw $10 104($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem105
+    lw $10 105($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem106
+    lw $10 106($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem107
+    lw $10 107($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem108
+    lw $10 108($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem109
+    lw $10 109($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem110
+    lw $10 110($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem111
+    lw $10 111($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem112
+    lw $10 112($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem113
+    lw $10 113($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem114
+    lw $10 114($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem115
+    lw $10 115($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem116
+    lw $10 116($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem117
+    lw $10 117($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem118
+    lw $10 118($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem119
+    lw $10 119($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem120
+    lw $10 120($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem121
+    lw $10 121($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem122
+    lw $10 122($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem123
+    lw $10 123($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem124
+    lw $10 124($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem125
+    lw $10 125($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem126
+    lw $10 126($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
+
+    #load zeroth valid move from dmem127
+    lw $10 127($0)
+    #compare valid move (y, x) to the dest of playermove (input_2)
+    bne $10, $2, 1
+    j handle_valid
     
-    
-    ...
+    #...
     j restoreColors
 
 restoreColors:
@@ -398,7 +690,34 @@ startLoopRestoreColors:
 endLoopRestoreColors:
     # wipe registers in reg file just in case
     addi $1, $0, 0
-    ...
+    addi $2, $0, 0
+    addi $3, $0, 0
+    addi $4, $0, 0
+    addi $5, $0, 0
+    addi $6, $0, 0
+    addi $7, $0, 0
+    addi $8, $0, 0
+    addi $9, $0, 0
+    addi $10, $0, 0
+    addi $11, $0, 0
+    addi $12, $0, 0
+    addi $13, $0, 0
+    addi $14, $0, 0
+    addi $15, $0, 0
+    addi $16, $0, 0
+    addi $17, $0, 0
+    addi $18, $0, 0
+    addi $19, $0, 0
+    addi $20, $0, 0
+    addi $21, $0, 0
+    addi $22, $0, 0
+    addi $23, $0, 0
+    addi $24, $0, 0
+    addi $25, $0, 0
+    addi $26, $0, 0
+    addi $27, $0, 0
+    addi $28, $0, 0
+    addi $29, $0, 0
     addi $30, $0, 0
     
     #reset 64 and 65 to be invalid
@@ -409,7 +728,36 @@ endLoopRestoreColors:
     #wipe 100-131
     addi $10, $0, -1
     sw $10, 100($0)
-    ...
+    sw $10, 101($0)
+    sw $10, 102($0)
+    sw $10, 103($0)
+    sw $10, 104($0)
+    sw $10, 105($0)
+    sw $10, 106($0)
+    sw $10, 107($0)
+    sw $10, 108($0)
+    sw $10, 109($0)
+    sw $10, 110($0)
+    sw $10, 111($0)
+    sw $10, 112($0)
+    sw $10, 113($0)
+    sw $10, 114($0)
+    sw $10, 115($0)
+    sw $10, 116($0)
+    sw $10, 117($0)
+    sw $10, 118($0)
+    sw $10, 119($0)
+    sw $10, 120($0)
+    sw $10, 121($0)
+    sw $10, 122($0)
+    sw $10, 123($0)
+    sw $10, 124($0)
+    sw $10, 125($0)
+    sw $10, 126($0)
+    sw $10, 127($0)
+    sw $10, 128($0)
+    sw $10, 129($0)
+    sw $10, 130($0)
     sw $10, 131($0)
     
     j 0
@@ -418,115 +766,115 @@ handle_valid:
     sw $3, 0($2)
     sw $0, 0($1)
     # add stuff with checking win conditions, etc.....
-    ...
+    #...
     # flip the turn
     j restoreColors
 
------------------------------------------------
------------------------------------------------
-#lw 
-#$4, 0($2)
+# -----------------------------------------------
+# -----------------------------------------------
+# #lw 
+# #$4, 0($2)
 
-#bne $1,  2
-#addi $29, $0, 1
-bne $0, $29, 1
-addi $29, $0, 0
+# #bne $1,  2
+# #addi $29, $0, 1
+# bne $0, $29, 1
+# addi $29, $0, 0
 
-bne $1, cond2 2
-addi $28, $0, 1
-bne $0, $28, 1
-addi $28, $0, 0
+# bne $1, cond2 2
+# addi $28, $0, 1
+# bne $0, $28, 1
+# addi $28, $0, 0
 
-and $res, $28, $29
-bne $res, don't do res
-do res
+# and $res, $28, $29
+# bne $res, don't do res
+# do res
 
-# do stuff
-bne $1, cond1, #63
-j move
-j 0
-bne $1, cond2, #65
-j move
-j 0
-bne $2, cond3, #2
-j move
-j 0
+# # do stuff
+# bne $1, cond1, #63
+# j move
+# j 0
+# bne $1, cond2, #65
+# j move
+# j 0
+# bne $2, cond3, #2
+# j move
+# j 0
 
-#check #2
-#if (cond1 && cond2):
-bne $1, cond1, #70
-bne $1, cond2, #70
-j move
+# #check #2
+# #if (cond1 && cond2):
+# bne $1, cond1, #70
+# bne $1, cond2, #70
+# j move
 
 
-#if input1:
-    if input2:
-           eval move
-      else: 
-          print green moves
-#else:
-#    go back to top of loop
+# #if input1:
+#     if input2:
+#            eval move
+#       else: 
+#           print green moves
+# #else:
+# #    go back to top of loop
 
-#if input2:
-    eval move
+# #if input2:
+#     eval move
    
 
 
-return:
-j 0
-##################GAME BIG LOOP ENDS HERE##########################
+# return:
+# j 0
+# ##################GAME BIG LOOP ENDS HERE##########################
 
-# possible functions
-j move
-j 0 # jump back to the beginning of the loop
-j findPieceAtPos
-j 0 # jump back to the beginning of the loop
-j move
-j 0 # jump back to the beginning of the loop
-
-
+# # possible functions
+# j move
+# j 0 # jump back to the beginning of the loop
+# j findPieceAtPos
+# j 0 # jump back to the beginning of the loop
+# j move
+# j 0 # jump back to the beginning of the loop
 
 
 
 
-move:
-    # inputs:
-    #   currCellData (32 bits), startPos (6 bit number), endPos (6 bit number)
-    # outputs:
-    # task:
-    # overwriting dest cell data with curr cell data, checking to see if we took a king by lwing the dest pos
-    # then restoreColors
-    # display win if necessary
 
 
-findPieceAtPos:
-    # inputs:
-    #   currColor, x, y
-    # task:
-    #   looks through 32 addresses in dmem to look for a piece at x,y that belongs to currColor
-    # outputs:
-    #   write these valid moves to each piece square background colors to indicate valid moves
-    #   write 28 32-bit writes to dmem. 000...dest_loc if valid move. Else its going to be all 1's (-1).
+# move:
+#     # inputs:
+#     #   currCellData (32 bits), startPos (6 bit number), endPos (6 bit number)
+#     # outputs:
+#     # task:
+#     # overwriting dest cell data with curr cell data, checking to see if we took a king by lwing the dest pos
+#     # then restoreColors
+#     # display win if necessary
 
-checkWin:
-    # inputs:
-    #   none
-    # outputs:
-    #   0 == 0, 1, or -1. 0 indicates nobody winning, 1 indicates white wins, -1 indicates black wins
 
-getPiece:
-    # input:
-    #   2 32 bit numbers (really 3 bit) -> x, y coords
-    # outputs:
-    #   the 32 bit piece from dmem
+# findPieceAtPos:
+#     # inputs:
+#     #   currColor, x, y
+#     # task:
+#     #   looks through 32 addresses in dmem to look for a piece at x,y that belongs to currColor
+#     # outputs:
+#     #   write these valid moves to each piece square background colors to indicate valid moves
+#     #   write 28 32-bit writes to dmem. 000...dest_loc if valid move. Else its going to be all 1's (-1).
 
-restoreColors:
-    # input: no input, but make sure to loop through 0-63 in dmem
-    # outputs: none, but write to dmem
+# checkWin:
+#     # inputs:
+#     #   none
+#     # outputs:
+#     #   0 == 0, 1, or -1. 0 indicates nobody winning, 1 indicates white wins, -1 indicates black wins
 
-findMovesForPiece:
-    # inputs:
-    #   32 bit piece
-    # outputs:
-    #   0-27 == store up to 28 possible moves into memory, storing nulls for the moves that aren't possible
+# getPiece:
+#     # input:
+#     #   2 32 bit numbers (really 3 bit) -> x, y coords
+#     # outputs:
+#     #   the 32 bit piece from dmem
+
+# restoreColors:
+#     # input: no input, but make sure to loop through 0-63 in dmem
+#     # outputs: none, but write to dmem
+
+# findMovesForPiece:
+#     # inputs:
+#     #   32 bit piece
+#     # outputs:
+#     #   0-27 == store up to 28 possible moves into memory, storing nulls for the moves that aren't possible
 
