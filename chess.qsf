@@ -166,6 +166,8 @@ set_location_assignment PIN_H21 -to leds[4]
 set_location_assignment PIN_G20 -to leds[5]
 set_location_assignment PIN_G22 -to leds[6]
 set_location_assignment PIN_G21 -to leds[7]
+set_location_assignment PIN_AB28 -to DEBUG_button_clicked
+set_global_assignment -name MIF_FILE chess.mif
 set_global_assignment -name MIF_FILE test.mif
 set_global_assignment -name VERILOG_FILE dmem_valid.v
 set_global_assignment -name VERILOG_FILE writeback_stage.v
@@ -304,7 +306,6 @@ set_global_assignment -name VERILOG_FILE white_bishop_index.v
 set_global_assignment -name VERILOG_FILE white_rook_index.v
 set_global_assignment -name VERILOG_FILE white_pawn_index.v
 set_global_assignment -name VERILOG_FILE black_rook_data.v
-set_location_assignment PIN_AB28 -to DEBUG_button_clicked
 set_global_assignment -name VERILOG_FILE PS2_Interface.v
 set_global_assignment -name VERILOG_FILE PS2_Controller.v
 set_global_assignment -name VERILOG_FILE Altera_UP_PS2_Command_Out.v

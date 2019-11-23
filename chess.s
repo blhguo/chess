@@ -75,14 +75,27 @@ nop
 lw $1, 64($0)
 lw $2, 65($0)
 
+addi $10 $0, -1
+bne $2, $10, 1
+bne $10, $0, 1
+jal debug2
+
+# addi $10 $0, 1
+# bne $1, $10, 1
+# jal debug
+
 # invalid initial position check, aka no input_1 has been made
 addi $10 $0 -1
-bne $10, $1, 1
+bne $10, $1, 4
+#reset 64 and 65 to be invalid
+addi $10, $0, -1
+sw $10, 64($0)
+sw $10, 65($0)
 j 0
 
 #CHeck if $2 is valid/active. is_$2_eq_-1 in $20
 #$20 = is_$2_invalid
-bne $2, $10 2
+bne $2, $10, 2
 addi $20, $0, 1
 bne $0, $20, 1
 addi $20, $0, 0
@@ -98,7 +111,11 @@ lw $3, 0($1)
 #14 = 000000...1110
 addi $10 $0 14
 and $11, $10, $3
-bne $11, $0, 1
+bne $11, $0, 4
+#reset 64 and 65 to be invalid
+addi $10, $0, -1
+sw $10, 64($0)
+sw $10, 65($0)
 j 0
 
 #$12 contains piece color
@@ -108,7 +125,11 @@ and $12, $10, $3
 and $13, $10, $30
 
 bne $12, $13, 1
-bne $10, $0, 1
+bne $10, $0, 4
+#reset 64 and 65 to be invalid
+addi $10, $0, -1
+sw $10, 64($0)
+sw $10, 65($0)
 j 0
 
 #If $1 is valid and $2 is valid
@@ -119,13 +140,29 @@ j handle2InValid
 j 0
 ##################GAME BIG LOOP ENDS HERE##########################
 
+debug:
+    addi $18, $0, 73
+    addi $17, $0, 36
+    sw $18, 0($17)
+    jr $31
+
+debug2:
+    addi $18, $0, 73
+    addi $17, $0, 37
+    sw $18, 0($17)
+    jr $31
+
+debug3:
+    addi $18, $0, 73
+    addi $17, $0, 38
+    sw $18, 0($17)
+    jr $31
+
 handle2Valid:
     # $1: (yx) of input1, $2: (yx) of input2, $3: cellData_input1 $4: cellData_input2    
     #'dont think we need this lw'
     lw $4, 0($2)
-    
-    jal move
-    j 0
+    j move
 
 ###!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODO:######################
 checkWin:
@@ -136,7 +173,7 @@ checkWin:
 handle2InValid:
     # $1: (yx) of input1, $3: cellData_input1
     #load arguments into registers
-    
+    # jal debug
     #$11 is going to hold the piece type, unshifted, then we shift it
     #$10 is going to hold the mask
     #10 = 000000...1110
@@ -147,7 +184,36 @@ handle2InValid:
     #wipe 100-131
     addi $10, $0, -1
     sw $10, 100($0)
-
+    sw $10, 101($0)
+    sw $10, 102($0)
+    sw $10, 103($0)
+    sw $10, 104($0)
+    sw $10, 105($0)
+    sw $10, 106($0)
+    sw $10, 107($0)
+    sw $10, 108($0)
+    sw $10, 109($0)
+    sw $10, 110($0)
+    sw $10, 111($0)
+    sw $10, 112($0)
+    sw $10, 113($0)
+    sw $10, 114($0)
+    sw $10, 115($0)
+    sw $10, 116($0)
+    sw $10, 117($0)
+    sw $10, 118($0)
+    sw $10, 119($0)
+    sw $10, 120($0)
+    sw $10, 121($0)
+    sw $10, 122($0)
+    sw $10, 123($0)
+    sw $10, 124($0)
+    sw $10, 125($0)
+    sw $10, 126($0)
+    sw $10, 127($0)
+    sw $10, 128($0)
+    sw $10, 129($0)
+    sw $10, 130($0)
     sw $10, 131($0)
     
     # handle knight
@@ -155,30 +221,30 @@ handle2InValid:
     bne $11 $10 1
     j handleKnight
     
-    # TODO: handle king
-    addi $10 $0 2
-    bne $11 $10 1
-    #j handleKing
+    # # TODO: handle king
+    # addi $10 $0 2
+    # bne $11 $10 1
+    # #j handleKing
     
-    # TODO: handle queen
-    addi $10 $0 3
-    bne $11 $10 1
-    #j handleQueen
+    # # TODO: handle queen
+    # addi $10 $0 3
+    # bne $11 $10 1
+    # #j handleQueen
     
-    # TODO: handle bishop
-    addi $10 $0 4
-    bne $11 $10 1
-    #j handleBishop
+    # # TODO: handle bishop
+    # addi $10 $0 4
+    # bne $11 $10 1
+    # #j handleBishop
     
-    # TODO: handle rook
-    addi $10 $0 5
-    bne $11 $10 1
-    #j handleRook
+    # # TODO: handle rook
+    # addi $10 $0 5
+    # bne $11 $10 1
+    # #j handleRook
     
-    # TODO: handle pawn
-    addi $10 $0 6
-    bne $11 $10 1
-    #j handlePawn
+    # # TODO: handle pawn
+    # addi $10 $0 6
+    # bne $11 $10 1
+    # #j handlePawn
     
 
     j 0
@@ -195,7 +261,7 @@ handleKnight:
     addi $8, $8, 2
     jal validateDestination #writes to $9 if valid move
     addi $19, $0, 1
-    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
     # create address for indexing into cell data: $10 has the address
     sll $10, $8, 3
     add $10, $10, $7
@@ -211,8 +277,7 @@ handleKnight:
     # write the new cell data to mem
     sw $11, 0($10)
     # write the address for indexing into cell data into address 100 (100 stored in $14)
-    addi $14, $0, 100
-    sw $10, 0($14)
+    sw $10, 100($0)
     # bne lands past here
     
     ############ $7 = x + 1, $8= y - 2
@@ -221,7 +286,7 @@ handleKnight:
     addi $8, $8, -2
     jal validateDestination #writes to $9 if valid move
     addi $19, $0, 1
-    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
     # create address for indexing into cell data: $10 has the address
     sll $10, $8, 3
     add $10, $10, $7
@@ -237,8 +302,7 @@ handleKnight:
     # write the new cell data to mem
     sw $11, 0($10)
     # write the address for indexing into cell data into address 100 (100 stored in $14)
-    addi $14, $0, 100
-    sw $10, 0($14)
+    sw $10, 101($0)
     
     ############ $7 = x - 1, $8= y + 2
     jal parseXY # parses $1 to make $7=x and $8=y
@@ -246,7 +310,7 @@ handleKnight:
     addi $8, $8, 2
     jal validateDestination #writes to $9 if valid move
     addi $19, $0, 1
-    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
     # create address for indexing into cell data: $10 has the address
     sll $10, $8, 3
     add $10, $10, $7
@@ -262,8 +326,7 @@ handleKnight:
     # write the new cell data to mem
     sw $11, 0($10)
     # write the address for indexing into cell data into address 100 (100 stored in $14)
-    addi $14, $0, 100
-    sw $10, 0($14)
+    sw $10, 102($0)
 
     ############ $7 = x - 1, $8= y - 2
     jal parseXY # parses $1 to make $7=x and $8=y
@@ -271,7 +334,7 @@ handleKnight:
     addi $8, $8, -2
     jal validateDestination #writes to $9 if valid move
     addi $19, $0, 1
-    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
     # create address for indexing into cell data: $10 has the address
     sll $10, $8, 3
     add $10, $10, $7
@@ -287,8 +350,7 @@ handleKnight:
     # write the new cell data to mem
     sw $11, 0($10)
     # write the address for indexing into cell data into address 100 (100 stored in $14)
-    addi $14, $0, 100
-    sw $10, 0($14)
+    sw $10, 103($0)
 
     ############ $7 = x + 2, $8= y + 1
     jal parseXY # parses $1 to make $7=x and $8=y
@@ -296,7 +358,7 @@ handleKnight:
     addi $8, $8, 1
     jal validateDestination #writes to $9 if valid move
     addi $19, $0, 1
-    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
     # create address for indexing into cell data: $10 has the address
     sll $10, $8, 3
     add $10, $10, $7
@@ -312,8 +374,7 @@ handleKnight:
     # write the new cell data to mem
     sw $11, 0($10)
     # write the address for indexing into cell data into address 100 (100 stored in $14)
-    addi $14, $0, 100
-    sw $10, 0($14)
+    sw $10, 104($0)
 
     ############ $7 = x + 2, $8= y - 1
     jal parseXY # parses $1 to make $7=x and $8=y
@@ -321,7 +382,7 @@ handleKnight:
     addi $8, $8, -1
     jal validateDestination #writes to $9 if valid move
     addi $19, $0, 1
-    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
     # create address for indexing into cell data: $10 has the address
     sll $10, $8, 3
     add $10, $10, $7
@@ -337,8 +398,7 @@ handleKnight:
     # write the new cell data to mem
     sw $11, 0($10)
     # write the address for indexing into cell data into address 100 (100 stored in $14)
-    addi $14, $0, 100
-    sw $10, 0($14)
+    sw $10, 105($0)
 
     ############ $7 = x - 2, $8= y + 1
     jal parseXY # parses $1 to make $7=x and $8=y
@@ -346,7 +406,7 @@ handleKnight:
     addi $8, $8, 1
     jal validateDestination #writes to $9 if valid move
     addi $19, $0, 1
-    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
     # create address for indexing into cell data: $10 has the address
     sll $10, $8, 3
     add $10, $10, $7
@@ -362,8 +422,7 @@ handleKnight:
     # write the new cell data to mem
     sw $11, 0($10)
     # write the address for indexing into cell data into address 100 (100 stored in $14)
-    addi $14, $0, 100
-    sw $10, 0($14)
+    sw $10, 106($0)
 
     ############ $7 = x - 2, $8= y - 1
     jal parseXY # parses $1 to make $7=x and $8=y
@@ -371,7 +430,7 @@ handleKnight:
     addi $8, $8, -1
     jal validateDestination #writes to $9 if valid move
     addi $19, $0, 1
-    bne $9, $19, 10 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
     # create address for indexing into cell data: $10 has the address
     sll $10, $8, 3
     add $10, $10, $7
@@ -387,10 +446,10 @@ handleKnight:
     # write the new cell data to mem
     sw $11, 0($10)
     # write the address for indexing into cell data into address 100 (100 stored in $14)
-    addi $14, $0, 100
-    sw $10, 0($14)
+    sw $10, 107($0)
 
     #... # do this for the other 5 cases, all should be same except for the offsets -> DONE :)
+    j 0
     
 
 parseXY:
@@ -656,6 +715,7 @@ restoreColors:
     addi $12, $0, 1 #lsb x mask 0001
     addi $13, $0, 8 #lsb y mask 1000
     addi $14, $0, 240 #square color mask 11110000
+    jal debug2
     j startLoopRestoreColors
 #looooop
 startLoopRestoreColors:
@@ -668,14 +728,14 @@ startLoopRestoreColors:
     sub $15, $15, $16
     
     # parse lsb x
-    and $17, $1, $12
+    and $17, $10, $12
     # parse lsb y and shift lsb y to line up with lsb x
-    and $18, $1, $13
+    and $18, $10, $13
     sra $18, $18, 3
     
     sub $19, $17, $18
     #if $19 == 0, same polarity, black square
-    bne $19, $0, 1
+    bne $19, $0, 2
     addi $15, $15, 128 #10000000
     bne $12, $0, 1 #just to skip running the write white sq part
     #else white square
@@ -687,6 +747,7 @@ startLoopRestoreColors:
     j startLoopRestoreColors #end loooooop
      
 endLoopRestoreColors:
+    jal debug3
     # wipe registers in reg file just in case
     addi $1, $0, 0
     addi $2, $0, 0
@@ -762,6 +823,7 @@ endLoopRestoreColors:
     j 0
     
 handle_valid:
+    jal debug
     sw $3, 0($2)
     sw $0, 0($1)
     # add stuff with checking win conditions, etc.....

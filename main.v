@@ -90,7 +90,7 @@ module main(
     wire [31:0] q_imem;
     imem my_imem(
         .address    (address_imem),            // address of data
-        .clock      (1'b0),//(~clock),                  // you may need to invert the clock
+        .clock      (~clock),                  // you may need to invert the clock
         .q          (q_imem)                   // the raw instruction
     );
 
@@ -128,17 +128,21 @@ module main(
 		.clock(~clock),
 		.data_a(data),
 		//need to add state, not just keyb write dat
-		.data_b(32'b00000000000000000000000001001001),//(keyboard_write_data),
+		.data_b(keyboard_write_data),//(32'b00000000000000000000000001001001),
 		.wren_a(wren),
 		.wren_b(keyboard_we),
 		.q_a(q_dmem),
 		.q_b(chess_data));
 		
 		
+//		wire [31:0] keyboard_write_data_temp;
+//		wire [11:0] chess_address_temp;
+//		assign chess_address_temp = chess_address == 12'd65 ? 12'd30 : chess_address;
+//		assign keyboard_write_data_temp = chess_address == 12'd65 ? 32'b00000000000000000000000001001001 : keyboard_write_data;
 		wire vga_clock_controled;
 		wire [11:0] chess_address_vga;
 		and vga_clock_and(vga_clock_controled, VGA_CLK, ~keyboard_we);
-		assign chess_address = keyboard_we ? 12'd36 : chess_address_vga;
+		assign chess_address = keyboard_we ? keyboard_write_address : chess_address_vga;
 	 
 //    dmem my_dmem(
 //        .address    (address_dmem),       // address of data

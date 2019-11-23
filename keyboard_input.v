@@ -53,15 +53,19 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 	always @(posedge clock)
 	begin
 		if (reg_reset == 1'b1) begin
-			last_input_letter = 8'h00;
-			last_input_number = 8'h00;
+			last_input_letter <= 8'h00;
+			last_input_number <= 8'h00;
 		end
 		else if (ps2_key_pressed == 1'b1) begin
 			if (ps2_key_data == 8'h6B) begin//left arrow
 				receivingInput2 <= 1'b0;
+				last_input_letter <= 8'h00;
+				last_input_number <= 8'h00;
 			end
 			else if(ps2_key_data == 8'h74) begin//right arrow
 				receivingInput2 <= 1'b1;
+				last_input_letter <= 8'h00;
+				last_input_number <= 8'h00;
 			end
 			else if(ps2_key_data == 8'h1C//A
 					|| ps2_key_data == 8'h32//B
