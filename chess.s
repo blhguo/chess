@@ -295,8 +295,10 @@ startLoopRookXAdd1:
     addi $10, $0, 14 #piece mask stored in $10 = 1110
     and $12, $11, $10 # store the non shifted piece info in $12
     # if piece at this cell is nonzero, do some more checks, otherwise dw keep looping
-    bne $12, $0, 1 
-    bne $10, $0, 6 # WARNING: this number will change depending on how many instructions
+    bne $12, $0, 2
+    addi $7, $7, 1 #x = x + 1
+    j startLoopRookXAdd1 #end loooooop
+    #bne $10, $0, 6 # WARNING: this number will change depending on how many instructions
     # Checks if diff color cells
     # uses: $11 = new cell data, $10 = color mask, $12 = curr player color, $13 = new cell color
     addi $10, $0, 1
