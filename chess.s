@@ -222,9 +222,9 @@ handle2InValid:
     j handleKnight
     
     # # TODO: handle king
-    # addi $10 $0 2
-    # bne $11 $10 1
-    # #j handleKing
+    addi $10 $0 2
+    bne $11 $10 1
+    j handleKing
     
     # # TODO: handle queen
     # addi $10 $0 3
@@ -237,18 +237,397 @@ handle2InValid:
     # #j handleBishop
     
     # # TODO: handle rook
-    # addi $10 $0 5
-    # bne $11 $10 1
-    # #j handleRook
+    addi $10 $0 5
+    bne $11 $10 1
+    j handleRook
     
     # # TODO: handle pawn
-    # addi $10 $0 6
-    # bne $11 $10 1
-    # #j handlePawn
+    addi $10 $0 6
+    bne $11 $10 1
+    j handlePawn
     
 
     j 0
 
+handlePawn:
+    # Access to:
+    #    $1: (yx) of input1
+    #    $30: state variable (has the current players color)
+    # Writes to dedicated $7 = x, $8 = y, $9 = wasValidDest
+
+    # storing current players color in $11 and color mask in $10
+    addi $10, $0, 1
+    and $11, $10, $30
+
+    # if curr pawn color is white, then whitePawnCheck, otherwise blackPawnCheck
+    bne $11, $0, 3
+    jal whitePawnCheck
+    addi $10, $0, 1
+    bne $10, $0, 1
+    jal blackPawnCheck
+
+    j 0
+
+blackPawnCheck:
+    j blackPawnCheckSub1
+
+blackPawnCheckSub1:
+    # check y - 1, if it fails, it also must fail y - 2, so continue to leftDiag
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, -1
+    jal validateDestination #writes to $9 if valid move
+    bne $9, $0, 1
+    j blackPawnLeftDiagCheck
+    
+    ### GET CELL DATA AT NEW CELL
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+
+    ### CHECKING IF PIECE IS AT THAT CELL AND FAIL IF THERE IS, cell data in $11
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is nonzero -> fail, go to leftdiag, otherwise mark valid, keep going
+    bne $12, $0, 1
+    bne $10, $0, 1
+    j blackPawnLeftDiagCheck
+
+    ### WRITING GREEN SQUARE AND VALID MOVE, $11 already has unaltered cell data
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # create address again for writing to cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100
+    sw $10, 100($0)
+
+    ### because you passed y - 1, move onto y - 2, but only if you are at y - 1= 5 rn
+    addi $10, $0, 5
+    bne $10, $8, 1
+    j blackPawnYSub2Check
+    j blackPawnLeftDiagCheck
+
+blackPawnYSub2Check:
+    # check y - 2 only if it passes y - 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, -2
+    jal validateDestination #writes to $9 if valid move
+    bne $9, $0, 1
+    j blackPawnLeftDiagCheck
+
+    ### GET CELL DATA AT NEW CELL
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+
+    ### CHECKING IF PIECE IS AT THAT CELL AND FAIL IF THERE IS, cell data in $11
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is nonzero -> fail, go to leftdiag, otherwise mark valid, keep going
+    bne $12, $0, 1
+    bne $10, $0, 1
+    j blackPawnLeftDiagCheck
+
+    ### WRITING GREEN SQUARE AND VALID MOVE, $11 already has unaltered cell data
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # create address again for writing to cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 101
+    sw $10, 101($0)
+    
+    j blackPawnLeftDiagCheck
+
+
+blackPawnLeftDiagCheck:
+    # check y - 1, x - 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, -1
+    addi $7, $7, -1
+    jal validateDestination #writes to $9 if valid move
+    bne $9, $0, 1
+    j blackPawnRightDiagCheck
+
+    ### GET CELL DATA AT NEW CELL
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+
+    ### CHECKING IF PIECE IS NOT AT THAT CELL AND FAIL IF THERE IS NO PIECE, cell data in $11
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is zero -> fail, go to rightdiag, otherwise mark valid, keep going
+    bne $12, $0, 1
+    j blackPawnRightDiagCheck
+
+    ### WRITING GREEN SQUARE AND VALID MOVE, $11 already has unaltered cell data
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # create address again for writing to cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 102
+    sw $10, 102($0)
+    
+    j blackPawnRightDiagCheck
+
+blackPawnRightDiagCheck:
+    # check y - 1, x + 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, -1
+    addi $7, $7, 1
+    jal validateDestination #writes to $9 if valid move
+    bne $9, $0, 1
+    j 0
+
+    ### GET CELL DATA AT NEW CELL
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+
+    ### CHECKING IF PIECE IS NOT AT THAT CELL AND FAIL IF THERE IS NO PIECE, cell data in $11
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is zero -> fail, go to rightdiag, otherwise mark valid, keep going
+    bne $12, $0, 1
+    j 0
+
+    ### WRITING GREEN SQUARE AND VALID MOVE, $11 already has unaltered cell data
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # create address again for writing to cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 102
+    sw $10, 103($0)
+    
+    j 0
+
+whitePawnCheck:
+    j whitePawnYAdd1Check
+
+whitePawnYAdd1Check:
+    # check y + 1, if it fails, it also must fail y + 2, so continue to leftDiag
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, 1
+    jal validateDestination #writes to $9 if valid move
+    bne $9, $0, 1
+    j whitePawnLeftDiagCheck
+    
+    ### GET CELL DATA AT NEW CELL
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+
+    ### CHECKING IF PIECE IS AT THAT CELL AND FAIL IF THERE IS, cell data in $11
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is nonzero -> fail, go to leftdiag, otherwise mark valid, keep going
+    bne $12, $0, 1
+    bne $10, $0, 1
+    j whitePawnLeftDiagCheck
+
+    ### WRITING GREEN SQUARE AND VALID MOVE, $11 already has unaltered cell data
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # create address again for writing to cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100
+    sw $10, 100($0)
+
+    ### because you passed y + 1, move onto y + 2, but only if you are at y + 1= 2 rn
+    addi $10, $0, 2
+    bne $10, $8, 1
+    j whitePawnYAdd2Check
+    j whitePawnLeftDiagCheck
+
+whitePawnYAdd2Check:
+    # check y + 2 only if it passes y + 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, 2
+    jal validateDestination #writes to $9 if valid move
+    bne $9, $0, 1
+    j whitePawnLeftDiagCheck
+
+    ### GET CELL DATA AT NEW CELL
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+
+    ### CHECKING IF PIECE IS AT THAT CELL AND FAIL IF THERE IS, cell data in $11
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is nonzero -> fail, go to leftdiag, otherwise mark valid, keep going
+    bne $12, $0, 1
+    bne $10, $0, 1
+    j whitePawnLeftDiagCheck
+
+    ### WRITING GREEN SQUARE AND VALID MOVE, $11 already has unaltered cell data
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # create address again for writing to cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 101
+    sw $10, 101($0)
+    
+    j whitePawnLeftDiagCheck
+
+
+whitePawnLeftDiagCheck:
+    # check y + 1, x - 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, 1
+    addi $7, $7, -1
+    jal validateDestination #writes to $9 if valid move
+    bne $9, $0, 1
+    j whitePawnRightDiagCheck
+
+    ### GET CELL DATA AT NEW CELL
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+
+    ### CHECKING IF PIECE IS NOT AT THAT CELL AND FAIL IF THERE IS NO PIECE, cell data in $11
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is zero -> fail, go to rightdiag, otherwise mark valid, keep going
+    bne $12, $0, 1
+    j whitePawnRightDiagCheck
+
+    ### WRITING GREEN SQUARE AND VALID MOVE, $11 already has unaltered cell data
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # create address again for writing to cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 102
+    sw $10, 102($0)
+    
+    j whitePawnRightDiagCheck
+
+whitePawnRightDiagCheck:
+    # check y + 1, x + 1
+    # check y + 1, x - 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, 1
+    addi $7, $7, 1
+    jal validateDestination #writes to $9 if valid move
+    bne $9, $0, 1
+    j 0
+
+    ### GET CELL DATA AT NEW CELL
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+
+    ### CHECKING IF PIECE IS NOT AT THAT CELL AND FAIL IF THERE IS NO PIECE, cell data in $11
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is zero -> fail, go to rightdiag, otherwise mark valid, keep going
+    bne $12, $0, 1
+    j 0
+
+    ### WRITING GREEN SQUARE AND VALID MOVE, $11 already has unaltered cell data
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # create address again for writing to cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 102
+    sw $10, 103($0)
+    
+    j 0
 
 handleKing:
     # Access to:
