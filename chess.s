@@ -250,6 +250,207 @@ handle2InValid:
     j 0
 
 
+handleKing:
+    # Access to:
+    #    $1: (yx) of input1
+    #    $30: state variable (has the current players color)
+    # Writes to dedicated $7 = x, $8 = y, $9 = wasValidDest
+    
+    ############ $7 = x + 1, $8= y -1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, 1
+    addi $8, $8, -1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    sw $10, 100($0)
+    # bne lands past here
+    
+    ############ $7 = x + 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, 1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    sw $10, 101($0)
+    
+    ############ $7 = x + 1, $8= y + 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, 1
+    addi $8, $8, 1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    sw $10, 102($0)
+
+    ############ $7 = x, $8= y - 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, -1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    sw $10, 103($0)
+
+    ############ $7 = x, $8= y + 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $8, $8, 1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    sw $10, 104($0)
+
+    ############ $7 = x - 1, $8= y - 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, -1
+    addi $8, $8, -1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    sw $10, 105($0)
+
+    ############ $7 = x - 1, $8= y
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, -1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    sw $10, 106($0)
+
+    ############ $7 = x - 1, $8= y + 1
+    jal parseXY # parses $1 to make $7=x and $8=y
+    addi $7, $7, -1
+    addi $8, $8, 1
+    jal validateDestination #writes to $9 if valid move
+    addi $19, $0, 1
+    bne $9, $19, 9 #!!!!WARNING!!!!: this number is subject to change if the number of instr changes
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into address 100 (100 stored in $14)
+    sw $10, 107($0)
+
+    #... # do this for the other 5 cases, all should be same except for the offsets -> DONE :)
+    j 0
+    
+
+
+
 handleRook:
     # Access to:
     #    $1: (yx) of input1
