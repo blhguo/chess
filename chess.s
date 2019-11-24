@@ -221,7 +221,7 @@ handle2InValid:
     bne $11 $10 1
     j handleKnight
     
-    # # TODO: handle king
+    # handle king
     addi $10 $0 2
     bne $11 $10 1
     j handleKing
@@ -236,17 +236,16 @@ handle2InValid:
     # bne $11 $10 1
     # #j handleBishop
     
-    # # TODO: handle rook
+    # handle rook
     addi $10 $0 5
     bne $11 $10 1
     j handleRook
     
-    # # TODO: handle pawn
+    # handle pawn
     addi $10 $0 6
     bne $11 $10 1
     j handlePawn
     
-
     j 0
 
 handlePawn:
@@ -260,12 +259,10 @@ handlePawn:
     and $11, $10, $30
 
     # if curr pawn color is white, then whitePawnCheck, otherwise blackPawnCheck
-    bne $11, $0, 3
+    bne $11, $0, 2
     jal whitePawnCheck
-    addi $10, $0, 1
-    bne $10, $0, 1
+    j 0
     jal blackPawnCheck
-
     j 0
 
 blackPawnCheck:
