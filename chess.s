@@ -78,7 +78,6 @@ lw $2, 65($0)
 addi $10 $0, -1
 bne $2, $10, 1
 bne $10, $0, 1
-jal debug2
 
 # addi $10 $0, 1
 # bne $1, $10, 1
@@ -1509,7 +1508,6 @@ startLoopRestoreColors:
     j startLoopRestoreColors #end loooooop
      
 endLoopRestoreColors:
-    jal debug3
     # wipe registers in reg file just in case
     addi $1, $0, 0
     addi $2, $0, 0
@@ -1585,13 +1583,35 @@ endLoopRestoreColors:
     j 0
     
 handle_valid:
-    jal debug
     sw $3, 0($2)
     sw $0, 0($1)
+    ##### commented out for now, test pieces first
     # add stuff with checking win conditions, etc.....
+    # startLoopCheckWin writes to $10 for a win, 0=no win, 1=win
+    # jal startLoopCheckWin
+    # addi $11, $0, 1
+    # bne $10, $11, 1
+    # jal debug #TODO: make this somehow display on the screen! RN its just the bishop signal
+
     #...
-    # flip the turn
+    ### flip the turn
+    # get the current color -> $11
+    # addi $10 $0 1
+    # and $11, $10, $30
+    # # if the curr color is white (0), make the next color black (1)
+    # bne $11, $0, 2
+    # sw $10, 66($0)
+    # bne $10, $0, 1
+    # # else make the next color white (0)
+    # sw $0, 66($0)
+
+    #####
     j restoreColors
+
+startLoopCheckWin:
+
+endLoopCbeckWin:
+    jr $31
 
 # -----------------------------------------------
 # -----------------------------------------------
