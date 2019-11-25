@@ -19,6 +19,8 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 	
 	wire reg_reset;
 	assign reg_reset = (last_input_letter != 8'b0 && last_input_number != 8'b0) || reset;
+//	assign reg_reset = reset;
+
 	
 	reg receivingInput2;
 	
@@ -56,7 +58,7 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 			last_input_letter <= 8'h00;
 			last_input_number <= 8'h00;
 		end
-		else if (ps2_key_pressed == 1'b1) begin
+		if (ps2_key_pressed == 1'b1) begin
 			if (ps2_key_data == 8'h6B) begin//left arrow
 				receivingInput2 <= 1'b0;
 				last_input_letter <= 8'h00;
