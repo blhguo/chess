@@ -231,9 +231,9 @@ handle2InValid:
     # #j handleQueen
     
     # # TODO: handle bishop
-    # addi $10 $0 4
-    # bne $11 $10 1
-    # #j handleBishop
+    addi $10 $0 4
+    bne $11 $10 1
+    j handleBishop
     
     # handle rook
     addi $10 $0 5
@@ -823,6 +823,197 @@ handleKing:
     #... # do this for the other 5 cases, all should be same except for the offsets -> DONE :)
     j 0
     
+handleBishop:
+    # Access to:
+    #    $1: (yx) of input1
+    #    $30: state variable (has the current players color)
+    # Writes to dedicated $7 = x, $8 = y, $9 = wasValidDest
+    # Writes to dedicated $6 = address, starting from 100
+    
+    addi $6, $0, 100
+    jal parseXY # parses $1 to make $7=x and $8=y
+    ############ $7 = x + 1, $8= y+1
+    addi $7, $7, 1
+    addi $8, $8, 1
+    j startLoopBishopXAdd1YAdd1
+#######START OF x+1 loop
+startLoopBishopXAdd1YAdd1:
+    ### CHECK IF MOVE IS VALID
+    jal validateDestination #writes to $9 if valid move
+    # if its valid, continue, else go to the end of this loop
+    bne $9, $0, 1
+    j endLoopBishopXAdd1YAdd1
+    
+    ### WRITING GREEN SQUARE AND VALID MOVE
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into current valid move address ($6)
+    sw $10, 0($6)
+    addi $6, $6, 1 #addr = addr + 1
+
+    ### CHECKING IF PIECE OF OPP. COLOR IS AT THAT CELL, cell data in $11 already
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is nonzero, do some more checks, otherwise dw keep looping
+    bne $12, $0, 3
+    addi $7, $7, 1 #x = x + 1
+    addi $8, $8, 1 #y = y + 1
+    j startLoopBishopXAdd1YAdd1 #end loooooop
+    j endLoopBishopXAdd1YAdd1
+
+#######END OF x+1 loop
+endLoopBishopXAdd1YAdd1:
+    jal parseXY # parses $1 to make $7=x and $8=y
+    ############ $7 = x + 1, $8= y - 1
+    addi $7, $7, 1
+    addi $8, $8, -1
+    j startLoopBishopXAdd1YSub1
+#######START OF x-1 loop
+startLoopBishopXAdd1YSub1:
+    ### CHECK IF MOVE IS VALID
+    jal validateDestination #writes to $9 if valid move
+    # if its valid, continue, else go to the end of this loop
+    bne $9, $0, 1
+    j endLoopBishopXAdd1YSub1
+    
+    ### WRITING GREEN SQUARE AND VALID MOVE
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into current valid move address ($6)
+    sw $10, 0($6)
+    addi $6, $6, 1 #addr = addr + 1
+    
+    ### CHECKING IF PIECE OF OPP. COLOR IS AT THAT CELL, cell data in $11 already
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is nonzero, do some more checks, otherwise dw keep looping
+    bne $12, $0, 3
+    addi $7, $7, 1 #x = x + 1
+    addi $8, $8, -1 #y = y - 1
+    j startLoopBishopXAdd1YSub1 #end loooooop
+    j endLoopBishopXAdd1YSub1
+
+#######END OF x-1 loop
+endLoopBishopXAdd1YSub1:
+    jal parseXY # parses $1 to make $7=x and $8=y
+    ############ $7 = x-1, $8= y + 1
+    addi $7, $7, -1
+    addi $8, $8, 1
+    j startLoopBishopXSub1YAdd1
+startLoopBishopXSub1YAdd1:
+    ### CHECK IF MOVE IS VALID
+    jal validateDestination #writes to $9 if valid move
+    # if its valid, continue, else go to the end of this loop
+    bne $9, $0, 1
+    j endLoopBishopXSub1YAdd1
+    
+    ### WRITING GREEN SQUARE AND VALID MOVE
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into current valid move address ($6)
+    sw $10, 0($6)
+    addi $6, $6, 1 #addr = addr + 1
+    
+    ### CHECKING IF PIECE OF OPP. COLOR IS AT THAT CELL, cell data in $11 already
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is nonzero, do some more checks, otherwise dw keep looping
+    bne $12, $0, 3
+    addi $7, $7, -1 #x = x - 1
+    addi $8, $8, 1 #y = y + 1
+    j startLoopBishopXSub1YAdd1 #end loooooop
+    j endLoopBishopXSub1YAdd1
+
+#######END OF x=x-1 loop
+endLoopBishopXSub1YAdd1:
+    jal parseXY # parses $1 to make $7=x and $8=y
+    ############ $7 = x-1, $8= y - 1
+    addi $7, $7, -1
+    addi $8, $8, -1
+    j startLoopBishopXSub1YSub1
+startLoopBishopXSub1YSub1:
+    ### CHECK IF MOVE IS VALID
+    jal validateDestination #writes to $9 if valid move
+    # if its valid, continue, else go to the end of this loop
+    bne $9, $0, 1
+    j endLoopBishopXSub1YSub1
+    
+    ### WRITING GREEN SQUARE AND VALID MOVE
+    # create address for indexing into cell data: $10 has the address
+    sll $10, $8, 3
+    add $10, $10, $7
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($10)
+    # replace the square color at that loc with green
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 16 #green sq color 00010000
+    # write the new cell data to mem
+    sw $11, 0($10)
+    # write the address for indexing into cell data into current valid move address ($6)
+    sw $10, 0($6)
+    addi $6, $6, 1 #addr = addr + 1
+    
+    ### CHECKING IF PIECE OF OPP. COLOR IS AT THAT CELL, cell data in $11 already
+    # Checks if there's a piece at new cell
+    # uses: $11 = new cell data, $10 = piece mask, $12 = piece info of new cell
+    addi $10, $0, 14 #piece mask stored in $10 = 1110
+    and $12, $11, $10 # store the non shifted piece info in $12
+    # if piece at this cell is nonzero, do some more checks, otherwise dw keep looping
+    bne $12, $0, 3
+    addi $7, $7, -1 #x = x - 1
+    addi $8, $8, -1 #y = y - 1
+    j startLoopBishopXSub1YSub1 #end loooooop
+    j endLoopBishopXSub1YSub1
+
+#######END OF y-1 loop
+endLoopBishopXSub1YSub1:
+    j 0
 
 
 
