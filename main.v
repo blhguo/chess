@@ -141,6 +141,7 @@ module main(
 //		assign keyboard_write_data_temp = chess_address == 12'd65 ? 32'b00000000000000000000000001001001 : keyboard_write_data;
 		wire vga_clock_controled;
 		wire [11:0] chess_address_vga;
+//		and vga_clock_and(vga_clock_controled, CLOCK_50, ~keyboard_we);
 		and vga_clock_and(vga_clock_controled, VGA_CLK, ~keyboard_we);
 		assign chess_address = keyboard_we ? keyboard_write_address : chess_address_vga;
 	 

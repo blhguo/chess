@@ -249,7 +249,7 @@ reg [11:0] dmemAddress, dmemAddressX, dmemAddressY;
 assign chess_address = dmemAddress;
 
 
-reg [4:0] colorSelector;
+reg [5:0] colorSelector;
 assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 1 ? 24'hCDE1F7 : //light brown like not simran
 					colorSelector == 2 ? 24'hEF330B : //red
@@ -348,7 +348,7 @@ begin
 	end
 	else begin
 		//don't display anything, outside the bounds of the chessboard
-		colorSelector = 3;
+		colorSelector = 16;
 	end
 	
 end

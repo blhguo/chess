@@ -1476,7 +1476,6 @@ restoreColors:
     addi $12, $0, 1 #lsb x mask 0001
     addi $13, $0, 8 #lsb y mask 1000
     addi $14, $0, 240 #square color mask 11110000
-    jal debug2
     j startLoopRestoreColors
 #looooop
 startLoopRestoreColors:
@@ -1596,14 +1595,14 @@ handle_valid:
     #...
     ### flip the turn
     # get the current color -> $11
-    # addi $10 $0 1
-    # and $11, $10, $30
-    # # if the curr color is white (0), make the next color black (1)
-    # bne $11, $0, 2
-    # sw $10, 66($0)
-    # bne $10, $0, 1
-    # # else make the next color white (0)
-    # sw $0, 66($0)
+    addi $10 $0 1
+    and $11, $10, $30
+    # if the curr color is white (0), make the next color black (1)
+    bne $11, $0, 2
+    sw $10, 66($0)
+    bne $10, $0, 1
+    # else make the next color white (0)
+    sw $0, 66($0)
 
     #####
     j restoreColors

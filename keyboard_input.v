@@ -18,6 +18,9 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 	assign key_just_released = ps2_out == 8'hF0;
 	
 	wire reg_reset;
+	
+//	reg reg_reset;
+//	assign reg_reset = keyboard_we;
 	assign reg_reset = (last_input_letter != 8'b0 && last_input_number != 8'b0) || reset;
 //	assign reg_reset = reset;
 
@@ -26,6 +29,12 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 	
 	reg [7:0] last_input_letter;
 	reg [7:0] last_input_number;
+	
+	initial begin
+			last_input_letter = 8'b0;
+			last_input_number = 8'b0;
+//			reg_reset = 1'b0;
+	end
 	
 	wire [2:0] keyboard_letter_conv;
 	assign keyboard_letter_conv = last_input_letter == 8'h1C ? 3'd0
@@ -58,7 +67,7 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 			last_input_letter <= 8'h00;
 			last_input_number <= 8'h00;
 		end
-		if (ps2_key_pressed == 1'b1) begin
+		else if (ps2_key_pressed == 1'b1) begin
 			if (ps2_key_data == 8'h6B) begin//left arrow
 				receivingInput2 <= 1'b0;
 				last_input_letter <= 8'h00;
