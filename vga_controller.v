@@ -266,7 +266,10 @@ assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 13 ? bgr_data_raw_bb : //black bishop
 					colorSelector == 14 ? bgr_data_raw_br : //black rook
 					colorSelector == 15 ? bgr_data_raw_bp : //black pawn
-					24'h000000;
+					colorSelector == 16 ? 24'hF5A442 : //light blue background
+					colorSelector == 17 ? 24'hFFFFFF : //white's turn background color square
+					colorSelector == 18 ? 24'h000000 : //black's turn background color square
+					24'hF5A442; //light blue background
 					
 
 wire [31:0] dmemData;
@@ -274,9 +277,11 @@ assign dmemData = chess_data;
 wire [2:0] pieceType;
 wire [3:0] squareColor;
 wire pieceColor;
+wire playerTurn;
 assign pieceType = dmemData[3:1];
 assign squareColor = dmemData[7:4];
 assign pieceColor = dmemData[0];
+assign playerTurn = pieceColor;
 
 always@(posedge iVGA_CLK) //clocking
 begin
@@ -344,6 +349,16 @@ begin
 		end
 		else begin
 			colorSelector = 3;
+		end
+	end
+	//whose turn square color display
+	else if (addressX >= 138 & addressX <= 182 & addressY >= 586 && addressY < 630) begin
+		dmemAddress = 12'd66;
+		if(playerTurn == 1'b0) begin
+			colorSelector = 17;
+		end
+		else begin
+			colorSelector = 18;
 		end
 	end
 	else begin
