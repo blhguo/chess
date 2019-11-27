@@ -84,6 +84,7 @@ assign imgAddressX = addressX % 64;
 assign imgAddressY = addressY % 64;
 wire [11:0] imgADDR;
 assign imgADDR = imgAddressY*64 + imgAddressX;
+
 wire [7:0] index_wkn,
 				index_wki,
 				index_wq,
@@ -244,12 +245,269 @@ black_pawn_index	black_pawn_index_inst (
 	);	
 	
 	
+wire [11:0] letterAddressX, letterAddressY;
+assign letterAddressX = (addressX - 16) % 32;
+assign letterAddressY = (addressY - 16) % 32;
+wire [11:0] letterADDR;
+assign letterADDR = letterAddressY*32 + letterAddressX;
+
+wire [7:0] index_a,
+				index_b,
+				index_c,
+				index_d,
+				index_e,
+				index_f,
+				index_g,
+				index_h,
+				index_1,
+				index_2,
+				index_3,
+				index_4,
+				index_5,
+				index_6,
+				index_7,
+				index_8;
+wire [23:0] bgr_data_raw_a,
+				bgr_data_raw_b,
+				bgr_data_raw_c,
+				bgr_data_raw_d,
+				bgr_data_raw_e,
+				bgr_data_raw_f,
+				bgr_data_raw_g,
+				bgr_data_raw_h,
+				bgr_data_raw_1,
+				bgr_data_raw_2,
+				bgr_data_raw_3,
+				bgr_data_raw_4,
+				bgr_data_raw_5,
+				bgr_data_raw_6,
+				bgr_data_raw_7,
+				bgr_data_raw_8;
+/*
+POSSIBLE COLOR INDEXES HERE
+*/
+//letters
+letter_a_data	letter_a_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_a )
+	);
+letter_a_index	letter_a_index_inst (
+	.address ( index_a ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_a)
+	);	
+letter_b_data	letter_b_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_b )
+	);
+letter_b_index	letter_b_index_inst (
+	.address ( index_b ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_b)
+	);	
+letter_c_data	letter_c_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_c )
+	);
+letter_c_index	letter_c_index_inst (
+	.address ( index_c ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_c)
+	);	
+letter_d_data	letter_d_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_d )
+	);
+letter_d_index	letter_d_index_inst (
+	.address ( index_d ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_d)
+	);	
+letter_e_data	letter_e_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_e )
+	);
+letter_e_index	letter_e_index_inst (
+	.address ( index_e ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_e)
+	);	
+letter_f_data	letter_f_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_f )
+	);
+letter_f_index	letter_f_index_inst (
+	.address ( index_f ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_f)
+	);	
+letter_g_data	letter_g_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_g )
+	);
+letter_g_index	letter_g_index_inst (
+	.address ( index_g ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_g)
+	);	
+letter_h_data	letter_h_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_h )
+	);
+letter_h_index	letter_h_index_inst (
+	.address ( index_h ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_h)
+	);	
+//numbers
+number_1_data	number_1_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_1 )
+	);
+number_1_index	number_1_index_inst (
+	.address ( index_1 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_1)
+	);	
+number_2_data	number_2_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_2 )
+	);
+number_2_index	number_2_index_inst (
+	.address ( index_2 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_2)
+	);	
+number_3_data	number_3_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_3 )
+	);
+number_3_index	number_3_index_inst (
+	.address ( index_3 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_3)
+	);	
+number_4_data	number_4_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_4 )
+	);
+number_4_index	number_4_index_inst (
+	.address ( index_4 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_4)
+	);	
+number_5_data	number_5_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_5 )
+	);
+number_5_index	number_5_index_inst (
+	.address ( index_5 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_5)
+	);	
+number_6_data	number_6_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_6 )
+	);
+number_6_index	number_6_index_inst (
+	.address ( index_6 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_6)
+	);	
+number_7_data	number_7_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_7 )
+	);
+number_7_index	number_7_index_inst (
+	.address ( index_7 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_7)
+	);	
+number_8_data	number_8_data_inst (
+	.address ( letterADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_8 )
+	);
+number_8_index	number_8_index_inst (
+	.address ( index_8 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_8)
+	);	
+
+	
+wire [11:0] turnAddressX, turnAddressY;
+assign turnAddressX = addressX  % 64;
+assign turnAddressY = addressY  % 64;
+wire [11:0] turnADDR;
+assign turnADDR = turnAddressY*64 + turnAddressX;
+
+wire [7:0] index_turn;
+wire [23:0] bgr_data_raw_turn;
+//turn image
+turn_data	turn_data_inst (
+	.address ( turnADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_turn )
+	);
+turn_index	turn_index_inst (
+	.address ( index_turn ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_turn)
+	);	
+	
+//win image
+wire [14:0] winAddressX, winAddressY;
+assign winAddressX = (addressX - 192) % 256;
+assign winAddressY = addressY  % 128;
+wire [14:0] winADDR;
+assign winADDR = winAddressY*256 + winAddressX;
+
+wire [7:0] index_wwins;
+wire [23:0] bgr_data_raw_wwins;
+wire [7:0] index_bwins;
+wire [23:0] bgr_data_raw_bwins;
+//turn image
+white_wins_data	white_wins_data_inst (
+	.address ( winADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_wwins )
+	);
+white_wins_index	white_wins_index_inst (
+	.address ( index_wwins ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_wwins)
+	);	
+black_wins_data	black_wins_data_inst (
+	.address ( winADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_bwins )
+	);
+black_wins_index	black_wins_index_inst (
+	.address ( index_bwins ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_bwins)
+	);	
 
 reg [11:0] dmemAddress, dmemAddressX, dmemAddressY;
 assign chess_address = dmemAddress;
 
 
-reg [5:0] colorSelector;
+reg [6:0] colorSelector;
 assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 1 ? 24'hCDE1F7 : //light brown like not simran
 					colorSelector == 2 ? 24'hEF330B : //red
@@ -269,6 +527,25 @@ assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 16 ? 24'hF5A442 : //light blue background
 					colorSelector == 17 ? 24'hFFFFFF : //white's turn background color square
 					colorSelector == 18 ? 24'h000000 : //black's turn background color square
+					colorSelector == 19 ? bgr_data_raw_a: //letter a
+					colorSelector == 20 ? bgr_data_raw_b: //letter b
+					colorSelector == 21 ? bgr_data_raw_c: //letter c
+					colorSelector == 22 ? bgr_data_raw_d: //letter d
+					colorSelector == 23 ? bgr_data_raw_e: //letter e
+					colorSelector == 24 ? bgr_data_raw_f: //letter f
+					colorSelector == 25 ? bgr_data_raw_g: //letter g
+					colorSelector == 26 ? bgr_data_raw_h: //letter h
+					colorSelector == 27 ? bgr_data_raw_8: //letter 8
+					colorSelector == 28 ? bgr_data_raw_7: //letter 7
+					colorSelector == 29 ? bgr_data_raw_6: //letter 6
+					colorSelector == 30 ? bgr_data_raw_5: //letter 5
+					colorSelector == 31 ? bgr_data_raw_4: //letter 4
+					colorSelector == 32 ? bgr_data_raw_3: //letter 3
+					colorSelector == 33 ? bgr_data_raw_2: //letter 2
+					colorSelector == 34 ? bgr_data_raw_1: //letter 1
+					colorSelector == 35 ? bgr_data_raw_turn: //turn:
+					colorSelector == 36 ? bgr_data_raw_wwins: //white wins!
+					colorSelector == 37 ? bgr_data_raw_bwins: //black wins!
 					24'hF5A442; //light blue background
 					
 
@@ -285,7 +562,10 @@ assign playerTurn = pieceColor;
 
 always@(posedge iVGA_CLK) //clocking
 begin
-	if (addressX >= 64 & addressX <= 576 & addressY >= 64 && addressY < 576) begin
+	if (addressX >= 192 & addressX <= 448 & addressY >= 256 && addressY < 384) begin
+		colorSelector = 37;
+	end
+	else if (addressX >= 64 & addressX <= 576 & addressY >= 64 && addressY < 576) begin
 		//figure out which address in dmem this corresponds to and extract the piece info/square color
 		dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
 		dmemAddressY = 7 - ((addressY - 64) >> 6);
@@ -360,6 +640,59 @@ begin
 		else begin
 			colorSelector = 18;
 		end
+	end
+	//letters
+	else if (addressX >= 80 & addressX <= 112 & addressY >= 16 && addressY < 48 && index_a != 0) begin
+		colorSelector = 19;
+	end
+	else if (addressX >= 144 & addressX <= 176 & addressY >= 16 && addressY < 48 && index_b != 0) begin
+		colorSelector = 20;
+	end
+	else if (addressX >= 208 & addressX <= 240 & addressY >= 16 && addressY < 48 && index_c != 0) begin
+		colorSelector = 21;
+	end
+	else if (addressX >= 272 & addressX <= 304 & addressY >= 16 && addressY < 48 && index_d != 0) begin
+		colorSelector = 22;
+	end
+	else if (addressX >= 336 & addressX <= 368 & addressY >= 16 && addressY < 48 && index_e != 0) begin
+		colorSelector = 23;
+	end
+	else if (addressX >= 400 & addressX <= 432 & addressY >= 16 && addressY < 48 && index_f != 0) begin
+		colorSelector = 24;
+	end
+	else if (addressX >= 464 & addressX <= 496 & addressY >= 16 && addressY < 48 && index_g != 0) begin
+		colorSelector = 25;
+	end
+	else if (addressX >= 528 & addressX <= 560 & addressY >= 16 && addressY < 48 && index_h != 0) begin
+		colorSelector = 26;
+	end
+	//numbers
+	else if (addressY >= 80 & addressY <= 112 & addressX >= 16 && addressX < 48 && index_8 != 0) begin
+		colorSelector = 27;
+	end
+	else if (addressY >= 144 & addressY <= 176 & addressX >= 16 && addressX < 48 && index_7 != 0) begin
+		colorSelector = 28;
+	end
+	else if (addressY >= 208 & addressY <= 240 & addressX >= 16 && addressX < 48 && index_6 != 0) begin
+		colorSelector = 29;
+	end
+	else if (addressY >= 272 & addressY <= 304 & addressX >= 16 && addressX < 48 && index_5 != 0) begin
+		colorSelector = 30;
+	end
+	else if (addressY >= 336 & addressY <= 368 & addressX >= 16 && addressX < 48 && index_4 != 0) begin
+		colorSelector = 31;
+	end
+	else if (addressY >= 400 & addressY <= 432 & addressX >= 16 && addressX < 48 && index_3 != 0) begin
+		colorSelector = 32;
+	end
+	else if (addressY >= 464 & addressY <= 496 & addressX >= 16 && addressX < 48 && index_2 != 0) begin
+		colorSelector = 33;
+	end
+	else if (addressY >= 528 & addressY <= 560 & addressX >= 16 && addressX < 48 && index_1 != 0) begin
+		colorSelector = 34;
+	end
+	else if (addressY >= 576 & addressY <= 640 & addressX >= 64 && addressX < 128 && index_turn != 0) begin
+		colorSelector = 35;
 	end
 	else begin
 		//don't display anything, outside the bounds of the chessboard
