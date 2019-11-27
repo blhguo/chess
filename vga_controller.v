@@ -555,17 +555,25 @@ wire [2:0] pieceType;
 wire [3:0] squareColor;
 wire pieceColor;
 wire playerTurn;
+wire playerWin;
 assign pieceType = dmemData[3:1];
 assign squareColor = dmemData[7:4];
 assign pieceColor = dmemData[0];
 assign playerTurn = pieceColor;
+assign playerWin = dmemData[1];
 
 always@(posedge iVGA_CLK) //clocking
 begin
-	if (addressX >= 192 & addressX <= 448 & addressY >= 256 && addressY < 384) begin
-		colorSelector = 37;
+	if (playerWin && addressX >= 192 & addressX <= 448 && addressY >= 256 && addressY < 384) begin
+		dmemAddress = 12'd66; //status address, see what color
+		if(playerTurn == 1'b1) begin //new turn is black, so winner was white
+			colorSelector = 36;
+		end
+		else begin //new turn is white, so winner was black
+			colorSelector = 37;
+		end
 	end
-	else if (addressX >= 64 & addressX <= 576 & addressY >= 64 && addressY < 576) begin
+	else if (addressX >= 64 && addressX <= 576 && addressY >= 64 && addressY < 576) begin
 		//figure out which address in dmem this corresponds to and extract the piece info/square color
 		dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
 		dmemAddressY = 7 - ((addressY - 64) >> 6);

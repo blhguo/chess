@@ -2168,11 +2168,11 @@ handle_valid:
     sub $30, $30, $11 # subtract current color
     # if the curr color is white (0), make the next color black (1)
     bne $11, $0, 1
-    addi $30, $30, $10 # add 1 to $30 to make it black
+    addi $30, $30, 1 # add 1 to $30 to make it black
     # else make the next color white (0)
     #$30's color already has been subtracted, so by default its now white
 
-    ##### commented out for now, test pieces first
+    # ##### commented out for now, test pieces first
     # add stuff with checking win conditions, etc.....
     # startLoopCheckWin writes to $12 for a win, 0=no win, 1=win
     addi $12, $0, 1 # default to a win
@@ -2221,7 +2221,7 @@ startLoopCheckWin:
     addi $10, $10, 1 # i = i + 1
     j startLoopCheckWin
 
-endLoopCbeckWin:
+endLoopCheckWin:
     jr $31
 
 # -----------------------------------------------
