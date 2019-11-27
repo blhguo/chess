@@ -2159,30 +2159,67 @@ endLoopRestoreColors:
 handle_valid:
     sw $3, 0($2)
     sw $0, 0($1)
-    ##### commented out for now, test pieces first
-    # add stuff with checking win conditions, etc.....
-    # startLoopCheckWin writes to $10 for a win, 0=no win, 1=win
-    # jal startLoopCheckWin
-    # addi $11, $0, 1
-    # bne $10, $11, 1
-    # jal debug #TODO: make this somehow display on the screen! RN its just the bishop signal
-
+    
     #...
     ### flip the turn
     # get the current color -> $11
-    addi $10 $0 1
+    addi $10, $0, 1
     and $11, $10, $30
+    sub $30, $30, $11 # subtract current color
     # if the curr color is white (0), make the next color black (1)
-    bne $11, $0, 2
-    sw $10, 66($0)
-    bne $10, $0, 1
+    bne $11, $0, 1
+    addi $30, $30, $10 # add 1 to $30 to make it black
     # else make the next color white (0)
-    sw $0, 66($0)
+    #$30's color already has been subtracted, so by default its now white
 
+    ##### commented out for now, test pieces first
+    # add stuff with checking win conditions, etc.....
+    # startLoopCheckWin writes to $12 for a win, 0=no win, 1=win
+    addi $12, $0, 1 # default to a win
+    addi $10, $0, 0 # address iterator $10 starts at 0
+    jal startLoopCheckWin # writes $12 to 0 if opponent's king is found!
+    addi $11, $0, 1
+    bne $12, $11, 1
+    # get this to display on the screen by writing to $30! this gets written to dmem in the next block of code
+    jal markWin # this writes win status to register 30
+
+    sw $30, 66($0) 
     #####
     j restoreColors
 
+markWin:
+    addi $10, $0, 2 # win status mask
+    and $11, $10, $30 # store current win status in $11
+    sub $30, $30, $11 # subtract those status bits
+    addi $30, $30, 2 # mark the status bits as win 0000...1x
+    jr $31
+
 startLoopCheckWin:
+    # dedicated scratch register 12 within this scope! write the win status to $12, default is 1, so only write 0 if no win
+    addi $11, $0, 64
+    bne $10, $11, 1
+    j endLoopCheckWin
+    # get opponent's color -> $13
+    addi $11, $0, 1 # color mask
+    and $13, $30, $11
+    
+    # get cell data at $10 -> store in $14
+    lw $14, 0($10)
+
+    # get piece info from cell data -> $15
+    addi $11, $0, 14
+    and $15, $11, $14
+    # get color info from cell data -> $16
+    addi $11, $0, 1
+    and $16, $11, $14
+    # if piece == king and color == opponent's color, set $12 = 0
+    addi $11, $0, 2 #010 = king. 
+    bne $15, $11, 3 #WARNING: bigger jump # of instrs dependent. If piece is not a king, go back to start of loop 
+    bne $16, $13, 2 # if color is not equal to opponents color, go back to start of loop
+    addi $12, $0, 0 # write 0 to $12
+    j endLoopCheckWin
+    addi $10, $10, 1 # i = i + 1
+    j startLoopCheckWin
 
 endLoopCbeckWin:
     jr $31
