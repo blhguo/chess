@@ -2209,6 +2209,7 @@ startLoopCheckWin:
     # get piece info from cell data -> $15
     addi $11, $0, 14
     and $15, $11, $14
+    sra $15, $15, 1
     # get color info from cell data -> $16
     addi $11, $0, 1
     and $16, $11, $14
