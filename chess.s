@@ -642,11 +642,9 @@ handlePawn:
     and $11, $10, $30
 
     # if curr pawn color is white, then whitePawnCheck, otherwise blackPawnCheck
-    bne $11, $0, 2
-    jal whitePawnCheck
-    j 0
-    jal blackPawnCheck
-    j 0
+    bne $11, $0, 1
+    j whitePawnCheck
+    j blackPawnCheck
 
 blackPawnCheck:
     j blackPawnCheckSub1
