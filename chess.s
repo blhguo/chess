@@ -2181,6 +2181,10 @@ handle_valid:
     # get this to display on the screen by writing to $30! this gets written to dmem in the next block of code
     jal markWin # this writes win status to register 30
 
+    addi $10 $0 3
+    bne $30, $10, 1
+    jal debug
+
     sw $30, 66($0) 
     #####
     j restoreColors

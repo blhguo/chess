@@ -564,79 +564,159 @@ assign playerWin = dmemData[1];
 
 always@(posedge iVGA_CLK) //clocking
 begin
-	if (playerWin && addressX >= 192 & addressX <= 448 && addressY >= 256 && addressY < 384) begin
-		dmemAddress = 12'd66; //status address, see what color
-		if(playerTurn == 1'b1) begin //new turn is black, so winner was white
-			colorSelector = 36;
+	if (addressX >= 64 && addressX <= 576 && addressY >= 64 && addressY < 576) begin
+		if (addressX >= 192 & addressX <= 448 && addressY >= 256 && addressY < 384) begin
+			if (addressX == 192 ) begin
+				dmemAddress = 12'd66;
+			end
+	//			else begin
+	//				dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
+	//				dmemAddressY = 7 - ((addressY - 64) >> 6);
+	//				dmemAddress = {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
+	//								dmemAddressY[2], dmemAddressY[1], dmemAddressY[0], 
+	//								dmemAddressX[2], dmemAddressX[1], dmemAddressX[0]};
+	//			end
+			
+			if (playerWin) begin
+				dmemAddress = 12'd66; //status address, see what color
+				if(playerTurn == 1'b1) begin //new turn is black, so winner was white
+					colorSelector = 36;
+				end
+				else begin //new turn is white, so winner was black
+					colorSelector = 37;
+				end
+			end
+			else if (addressX != 192) begin
+				dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
+				dmemAddressY = 7 - ((addressY - 64) >> 6);
+				dmemAddress = {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
+								dmemAddressY[2], dmemAddressY[1], dmemAddressY[0], 
+								dmemAddressX[2], dmemAddressX[1], dmemAddressX[0]};
+				//display pieces based on dmem data
+				//white pieces
+				if ( pieceType == 1 && pieceColor == 0 && index_wkn != 0) begin
+					colorSelector = 4;
+				end
+				else if ( pieceType == 2 && pieceColor == 0 && index_wki != 0) begin
+					colorSelector = 5;
+				end
+				else if ( pieceType == 3 && pieceColor == 0 && index_wq != 0) begin
+					colorSelector = 6;
+				end
+				else if ( pieceType == 4 && pieceColor == 0 && index_wb != 0) begin
+					colorSelector = 7;
+				end
+				else if ( pieceType == 5 && pieceColor == 0 && index_wr != 0) begin
+					colorSelector = 8;
+				end
+				else if ( pieceType == 6 && pieceColor == 0 && index_wp != 0) begin
+					colorSelector = 9;
+				end
+				
+				//black pieces
+				else if ( pieceType == 1 && pieceColor == 1 && index_bkn != 0) begin
+					colorSelector = 10;
+				end
+				else if ( pieceType == 2 && pieceColor == 1 && index_bki != 0) begin
+					colorSelector = 11;
+				end
+				else if ( pieceType == 3 && pieceColor == 1 && index_bq != 0) begin
+					colorSelector = 12;
+				end
+				else if ( pieceType == 4 && pieceColor == 1 && index_bb != 0) begin
+					colorSelector = 13;
+				end
+				else if ( pieceType == 5 && pieceColor == 1 && index_br != 0) begin
+					colorSelector = 14;
+				end
+				else if ( pieceType == 6 && pieceColor == 1 && index_bp != 0) begin
+					colorSelector = 15;
+				end
+				//figure out the square color
+				else	if (squareColor[3]) begin //black
+					colorSelector = 0;
+				end
+				else if (squareColor[2]) begin  //white
+					colorSelector = 1;
+				end
+				else if (squareColor[1]) begin  //red
+					colorSelector = 2;
+				end
+				else if (squareColor[0]) begin  //green
+					colorSelector = 3;
+				end
+				else begin
+					colorSelector = 3;
+				end
+			end
 		end
-		else begin //new turn is white, so winner was black
-			colorSelector = 37;
-		end
-	end
-	else if (addressX >= 64 && addressX <= 576 && addressY >= 64 && addressY < 576) begin
+		
+	
 		//figure out which address in dmem this corresponds to and extract the piece info/square color
-		dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
-		dmemAddressY = 7 - ((addressY - 64) >> 6);
-		dmemAddress = {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
-							dmemAddressY[2], dmemAddressY[1], dmemAddressY[0], 
-							dmemAddressX[2], dmemAddressX[1], dmemAddressX[0]};
-		
-		
-		//display pieces based on dmem data
-		//white pieces
-		if ( pieceType == 1 && pieceColor == 0 && index_wkn != 0) begin
-			colorSelector = 4;
-		end
-		else if ( pieceType == 2 && pieceColor == 0 && index_wki != 0) begin
-			colorSelector = 5;
-		end
-		else if ( pieceType == 3 && pieceColor == 0 && index_wq != 0) begin
-			colorSelector = 6;
-		end
-		else if ( pieceType == 4 && pieceColor == 0 && index_wb != 0) begin
-			colorSelector = 7;
-		end
-		else if ( pieceType == 5 && pieceColor == 0 && index_wr != 0) begin
-			colorSelector = 8;
-		end
-		else if ( pieceType == 6 && pieceColor == 0 && index_wp != 0) begin
-			colorSelector = 9;
-		end
-		
-		//black pieces
-		else if ( pieceType == 1 && pieceColor == 1 && index_bkn != 0) begin
-			colorSelector = 10;
-		end
-		else if ( pieceType == 2 && pieceColor == 1 && index_bki != 0) begin
-			colorSelector = 11;
-		end
-		else if ( pieceType == 3 && pieceColor == 1 && index_bq != 0) begin
-			colorSelector = 12;
-		end
-		else if ( pieceType == 4 && pieceColor == 1 && index_bb != 0) begin
-			colorSelector = 13;
-		end
-		else if ( pieceType == 5 && pieceColor == 1 && index_br != 0) begin
-			colorSelector = 14;
-		end
-		else if ( pieceType == 6 && pieceColor == 1 && index_bp != 0) begin
-			colorSelector = 15;
-		end
-		//figure out the square color
-		else	if (squareColor[3]) begin //black
-			colorSelector = 0;
-		end
-		else if (squareColor[2]) begin  //white
-			colorSelector = 1;
-		end
-		else if (squareColor[1]) begin  //red
-			colorSelector = 2;
-		end
-		else if (squareColor[0]) begin  //green
-			colorSelector = 3;
-		end
 		else begin
-			colorSelector = 3;
+			dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
+			dmemAddressY = 7 - ((addressY - 64) >> 6);
+			dmemAddress = {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
+								dmemAddressY[2], dmemAddressY[1], dmemAddressY[0], 
+								dmemAddressX[2], dmemAddressX[1], dmemAddressX[0]};
+		
+		
+			//display pieces based on dmem data
+			//white pieces
+			if ( pieceType == 1 && pieceColor == 0 && index_wkn != 0) begin
+				colorSelector = 4;
+			end
+			else if ( pieceType == 2 && pieceColor == 0 && index_wki != 0) begin
+				colorSelector = 5;
+			end
+			else if ( pieceType == 3 && pieceColor == 0 && index_wq != 0) begin
+				colorSelector = 6;
+			end
+			else if ( pieceType == 4 && pieceColor == 0 && index_wb != 0) begin
+				colorSelector = 7;
+			end
+			else if ( pieceType == 5 && pieceColor == 0 && index_wr != 0) begin
+				colorSelector = 8;
+			end
+			else if ( pieceType == 6 && pieceColor == 0 && index_wp != 0) begin
+				colorSelector = 9;
+			end
+			
+			//black pieces
+			else if ( pieceType == 1 && pieceColor == 1 && index_bkn != 0) begin
+				colorSelector = 10;
+			end
+			else if ( pieceType == 2 && pieceColor == 1 && index_bki != 0) begin
+				colorSelector = 11;
+			end
+			else if ( pieceType == 3 && pieceColor == 1 && index_bq != 0) begin
+				colorSelector = 12;
+			end
+			else if ( pieceType == 4 && pieceColor == 1 && index_bb != 0) begin
+				colorSelector = 13;
+			end
+			else if ( pieceType == 5 && pieceColor == 1 && index_br != 0) begin
+				colorSelector = 14;
+			end
+			else if ( pieceType == 6 && pieceColor == 1 && index_bp != 0) begin
+				colorSelector = 15;
+			end
+			//figure out the square color
+			else	if (squareColor[3]) begin //black
+				colorSelector = 0;
+			end
+			else if (squareColor[2]) begin  //white
+				colorSelector = 1;
+			end
+			else if (squareColor[1]) begin  //red
+				colorSelector = 2;
+			end
+			else if (squareColor[0]) begin  //green
+				colorSelector = 3;
+			end
+			else begin
+				colorSelector = 3;
+			end
 		end
 	end
 	//whose turn square color display
