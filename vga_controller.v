@@ -7,7 +7,8 @@ module vga_controller(iRST_n,
                       g_data,
                       r_data, 
 							 chess_address,
-							 chess_data);
+							 chess_data,
+							 kp);
 
 	
 input iRST_n;
@@ -19,7 +20,8 @@ output reg oVS;
 output [7:0] b_data;
 output [7:0] g_data;  
 output [7:0] r_data;      
-output [11:0] chess_address;                  
+output [11:0] chess_address;
+input kp;                  
 ///////// ////                     
 reg [18:0] ADDR;
 reg [23:0] bgr_data;
@@ -546,6 +548,7 @@ assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 35 ? bgr_data_raw_turn: //turn:
 					colorSelector == 36 ? bgr_data_raw_wwins: //white wins!
 					colorSelector == 37 ? bgr_data_raw_bwins: //black wins!
+					colorSelector == 38 ? 24'h0091DA: //hazel background
 					24'hF5A442; //light blue background
 					
 
@@ -633,20 +636,20 @@ begin
 					colorSelector = 15;
 				end
 				//figure out the square color
-				else	if (squareColor[3]) begin //black
+				else	if (squareColor == 4'b1000) begin //black
 					colorSelector = 0;
 				end
-				else if (squareColor[2]) begin  //white
+				else if (squareColor == 4'b0100) begin  //white
 					colorSelector = 1;
 				end
-				else if (squareColor[1]) begin  //red
+				else if (squareColor == 4'b0010) begin  //red
 					colorSelector = 2;
 				end
-				else if (squareColor[0]) begin  //green
+				else if (squareColor == 4'b0001) begin  //green
 					colorSelector = 3;
 				end
-				else begin
-					colorSelector = 3;
+				else if (squareColor == 4'b0011) begin  //hazel
+					colorSelector = 38;
 				end
 			end
 		end
@@ -702,25 +705,25 @@ begin
 				colorSelector = 15;
 			end
 			//figure out the square color
-			else	if (squareColor[3]) begin //black
+			else	if (squareColor == 4'b1000) begin //black
 				colorSelector = 0;
 			end
-			else if (squareColor[2]) begin  //white
+			else if (squareColor == 4'b0100) begin  //white
 				colorSelector = 1;
 			end
-			else if (squareColor[1]) begin  //red
+			else if (squareColor == 4'b0010) begin  //red
 				colorSelector = 2;
 			end
-			else if (squareColor[0]) begin  //green
+			else if (squareColor == 4'b0001) begin  //green
 				colorSelector = 3;
 			end
-			else begin
-				colorSelector = 3;
+			else if (squareColor == 4'b0011) begin  //hazel
+				colorSelector = 38;
 			end
 		end
 	end
 	//whose turn square color display
-	else if (addressX >= 138 & addressX <= 182 & addressY >= 586 && addressY < 630) begin
+	else if (addressX >= 138 & addressX <= 182 & addressY >= 10 && addressY < 54) begin
 		dmemAddress = 12'd66;
 		if(playerTurn == 1'b0) begin
 			colorSelector = 17;
@@ -730,28 +733,28 @@ begin
 		end
 	end
 	//letters
-	else if (addressX >= 80 & addressX <= 112 & addressY >= 16 && addressY < 48 && index_a != 0) begin
+	else if (addressX >= 80 & addressX <= 112 & addressY >= 592 && addressY < 624 && index_a != 0) begin
 		colorSelector = 19;
 	end
-	else if (addressX >= 144 & addressX <= 176 & addressY >= 16 && addressY < 48 && index_b != 0) begin
+	else if (addressX >= 144 & addressX <= 176 & addressY >= 592 && addressY < 624 && index_b != 0) begin
 		colorSelector = 20;
 	end
-	else if (addressX >= 208 & addressX <= 240 & addressY >= 16 && addressY < 48 && index_c != 0) begin
+	else if (addressX >= 208 & addressX <= 240 & addressY >= 592 && addressY < 624 && index_c != 0) begin
 		colorSelector = 21;
 	end
-	else if (addressX >= 272 & addressX <= 304 & addressY >= 16 && addressY < 48 && index_d != 0) begin
+	else if (addressX >= 272 & addressX <= 304 & addressY >= 592 && addressY < 624 && index_d != 0) begin
 		colorSelector = 22;
 	end
-	else if (addressX >= 336 & addressX <= 368 & addressY >= 16 && addressY < 48 && index_e != 0) begin
+	else if (addressX >= 336 & addressX <= 368 & addressY >= 592 && addressY < 624 && index_e != 0) begin
 		colorSelector = 23;
 	end
-	else if (addressX >= 400 & addressX <= 432 & addressY >= 16 && addressY < 48 && index_f != 0) begin
+	else if (addressX >= 400 & addressX <= 432 & addressY >= 592 && addressY < 624 && index_f != 0) begin
 		colorSelector = 24;
 	end
-	else if (addressX >= 464 & addressX <= 496 & addressY >= 16 && addressY < 48 && index_g != 0) begin
+	else if (addressX >= 464 & addressX <= 496 & addressY >= 592 && addressY < 624 && index_g != 0) begin
 		colorSelector = 25;
 	end
-	else if (addressX >= 528 & addressX <= 560 & addressY >= 16 && addressY < 48 && index_h != 0) begin
+	else if (addressX >= 528 & addressX <= 560 & addressY >= 592 && addressY < 624 && index_h != 0) begin
 		colorSelector = 26;
 	end
 	//numbers
@@ -779,12 +782,18 @@ begin
 	else if (addressY >= 528 & addressY <= 560 & addressX >= 16 && addressX < 48 && index_1 != 0) begin
 		colorSelector = 34;
 	end
-	else if (addressY >= 576 & addressY <= 640 & addressX >= 64 && addressX < 128 && index_turn != 0) begin
+	//turn
+	else if (addressY >= 0 & addressY <= 64 & addressX >= 64 && addressX < 128 && index_turn != 0) begin
 		colorSelector = 35;
 	end
 	else begin
+		if (kp) begin
+			   colorSelector = 1;
+		end
+		else begin
 		//don't display anything, outside the bounds of the chessboard
 		colorSelector = 16;
+		end
 	end
 	
 end

@@ -74,6 +74,10 @@ nop
 
 lw $1, 64($0)
 lw $2, 65($0)
+lw $10, 67($0)
+addi $11 $0 1
+bne $10 $11 1
+j reset
 
 addi $10 $0, -1
 bne $2, $10, 1
@@ -173,6 +177,20 @@ handle2InValid:
     # $1: (yx) of input1, $3: cellData_input1
     #load arguments into registers
     # jal debug
+
+    ### WRITING HAZEL SQUARE AND VALID MOVE
+    # get the cell data at that loc: $11 has the cell data
+    lw $11, 0($1)
+    # replace the square color at that loc with hazel
+    #     $12 has the square color mask
+    #     $13 has the square color bits that we will subtract
+    addi $12, $0, 240 #square color mask 11110000
+    and $13, $11, $12
+    sub $11, $11, $13
+    addi $11, $11, 48 #hazel sq color 00110000
+    # write the new cell data to mem
+    sw $11, 0($1)
+
     #$11 is going to hold the piece type, unshifted, then we shift it
     #$10 is going to hold the mask
     #10 = 000000...1110
@@ -215,6 +233,8 @@ handle2InValid:
     sw $10, 130($0)
     sw $10, 131($0)
     
+
+
     # handle knight
     addi $10 $0 1
     bne $11 $10 1
@@ -2227,6 +2247,25 @@ startLoopCheckWin:
 endLoopCheckWin:
     jr $31
 
+reset:
+    addi $10 $0 200
+    addi $11 $0 0
+    addi $13 $0 64
+    j startReset
+
+startReset:
+    bne $11 $13 1
+    j endReset
+    lw $12 0($10)
+    sw $12 0($11)
+    addi $10 $10 1
+    addi $11 $11 1
+    j startReset
+
+endReset:
+    sw $0 66($0)
+    sw $0 67($0)
+    j restoreColors
 # -----------------------------------------------
 # -----------------------------------------------
 # #lw 
