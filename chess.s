@@ -91,12 +91,17 @@ bne $10, $0, 1
 
 # invalid initial position check, aka no input_1 has been made
 addi $10 $0 -1
-bne $10, $1, 4
+bne $10, $1, 6
 #reset 64 and 65 to be invalid
+lw $1 69($0)
+bne $10, $1, 4
 addi $10, $0, -1
 sw $10, 64($0)
 sw $10, 65($0)
 j 0
+
+#Save $1 back into 64, can be redundant but andys a bitch
+sw $1 64($0)
 
 #CHeck if $2 is valid/active. is_$2_eq_-1 in $20
 #$20 = is_$2_invalid
@@ -107,6 +112,14 @@ addi $20, $0, 0
 
 lw $30, 66($0)
 lw $3, 0($1)
+
+#COMPARE PREV $1 to CURR $1
+lw $13, 69($0)
+sw $1, 69($0)
+bne $1, $13, 2
+addi $10, $0, 1
+bne $0, $10, 1
+j restoreColors
 
 ######right-aligned
 ######ex: 1000     110     0       : is a white pawn
@@ -1891,6 +1904,10 @@ move:
     # -> then restoreColors (RESETS all register file data and cleans up the DMEM
     # display win if necessary
     # reset $1 and $2 to be invalid (-1)    
+
+    #WIPE 69
+    addi $10 $0 -1
+    sw $10 69($0)
     
     #################CHECK ALL DMEM VALID MOVES COMPARE############
     ##!!!!!!!!!!!!!!!!!!!!!!!!ADD MORE OF THEM 28 -> DONE :)!!!!!!!!!!!!!!!!##    
@@ -2212,6 +2229,8 @@ handle_valid:
 
     sw $30, 66($0) 
     #####
+
+
     j restoreColors
 
 markWin:
