@@ -481,7 +481,6 @@ wire [7:0] index_wwins;
 wire [23:0] bgr_data_raw_wwins;
 wire [7:0] index_bwins;
 wire [23:0] bgr_data_raw_bwins;
-//turn image
 white_wins_data	white_wins_data_inst (
 	.address ( winADDR ),
 	.clock ( VGA_CLK_n ),
@@ -501,6 +500,58 @@ black_wins_index	black_wins_index_inst (
 	.address ( index_bwins ),
 	.clock ( iVGA_CLK ),
 	.q ( bgr_data_raw_bwins)
+	);	
+
+//game mode images
+wire [11:0] gameModeAddressX, gameModeAddressY;
+assign gameModeAddressX = (addressX - 448) % 128;
+assign gameModeAddressY = (addressY - 16) % 32;
+wire [11:0] gameModeADDR;
+assign gameModeADDR = gameModeAddressY*128 + gameModeAddressX;
+
+wire [7:0] index_cchess;
+wire [23:0] bgr_data_raw_cchess;
+wire [7:0] index_koh;
+wire [23:0] bgr_data_raw_koh;
+cchess_data	cchess_data_inst (
+	.address ( gameModeADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_cchess )
+	);
+cchess_index	cchess_index_inst (
+	.address ( index_cchess ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_cchess)
+	);	
+koh_data	koh_data_inst (
+	.address ( gameModeADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_koh )
+	);
+koh_index	koh_index_inst (
+	.address ( index_koh ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_koh)
+	);	
+
+//instructions image
+wire [13:0] instrAddressX, instrAddressY;
+assign instrAddressX = (addressX - 592) % 32;
+assign instrAddressY = (addressY - 128) % 384;
+wire [13:0] instrADDR;
+assign instrADDR = instrAddressY*32 + instrAddressX;
+
+wire [7:0] index_instr;
+wire [23:0] bgr_data_raw_instr;
+instructions_data	instructions_data_inst (
+	.address ( instrADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_instr )
+	);
+instructions_index	instructions_index_inst (
+	.address ( index_instr ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_instr)
 	);	
 
 reg [11:0] dmemAddress, dmemAddressX, dmemAddressY;
@@ -547,6 +598,9 @@ assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 36 ? bgr_data_raw_wwins: //white wins!
 					colorSelector == 37 ? bgr_data_raw_bwins: //black wins!
 					colorSelector == 38 ? 24'h0091DA: //hazel background
+					colorSelector == 39 ? bgr_data_raw_instr: //instructions
+					colorSelector == 40 ? bgr_data_raw_cchess: //classic chess mode
+					colorSelector == 41 ? bgr_data_raw_koh: //koh mode
 					24'hF5A442; //light blue background
 					
 
@@ -723,6 +777,24 @@ begin
 			else if (squareColor == 4'b0011) begin  //hazel
 				colorSelector = 38;
 			end
+		end
+	end
+	//instructions display
+	else if(addressX >= 592 && addressX <= 624 && addressY >= 128 && addressY < 512 && index_instr != 0) begin
+		colorSelector = 39;
+	end
+	//possible modes: classic chess and king of the hill
+	//instructions display
+	else if(addressX >= 448 && addressX <= 576 && addressY >= 16 && addressY < 48) begin
+		dmemAddress = 12'd66;
+		if(~is_KingHill && index_cchess != 0) begin
+			colorSelector = 40;
+		end
+		else if(is_KingHill && index_koh != 0) begin
+			colorSelector = 41
+		end
+		else begin
+			colorSelector = 16;
 		end
 	end
 	//whose turn square color display
