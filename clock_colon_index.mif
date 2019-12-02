@@ -1,0 +1,22 @@
+DEPTH = 16;
+WIDTH = 24;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+CONTENT BEGIN
+0:	808080;
+1:	606060;
+2:	404040;
+3:	616161;
+4:	3d3d3d;
+5:	000000;
+6:	3f3f3f;
+7:	5f5f5f;
+8:	5a5a5a;
+9:	343434;
+a:	5b5b5b;
+b:	3e3e3e;
+c:	666666;
+d:	4b4b4b;
+e:	676767;
+f:	0;
+END;
