@@ -2193,7 +2193,64 @@ endLoopRestoreColors:
     
     j 0
     
+promote:
+    #At this point, we check if the piece is a pawn. No presumptions on preexisting checks are made yet
+    #Inputs: $3 contains the cell-data that we want to write to the address stored at $2 (destination address)
+    # $1 contains the currently selected cell address. $1 will be wiped to zeros, then restore colored
+    
+    #Find if piece here is pawn
+    addi $10 $0 14
+    and $10 $3 $10
+    sra $10 $10 1
+    addi $11 $0 6
+    bne $10 $11 1
+    bne $11 $0 1
+    jr $31
+
+    #At this point, we've determined that the piece is indeed a pawn
+    addi $10 $0 1
+    and $10 $3 $10
+    #$10 holds the piece color
+    bne $10 $0 1
+    j promoteWhite
+    j promoteBlack
+
+promoteBlack:
+    #We now know that the piece is a black pawn. All that we need to check is if the piece is at the end of the board
+    #End of the board is encoded in the y-position of the destination, which is $2
+    #Get y value of $2
+    addi $10 $0 56
+    and $10 $10 $2
+    sra $10 $10 3
+    #$10 now has y value
+    bne $10 $0 4
+    #If the Y position is zero, then replace piece type with queen
+    addi $10 $0 14
+    and $10 $3 $10
+    sub $3 $3 $10
+    addi $3 $3 6
+    jr $31
+
+promoteWhite:
+    #We now know that the piece is a white pawn. All that we need to check is if the piece is at the end of the board
+    #End of the board is encoded in the y-position of the destination, which is $2
+    #Get y value of $2
+    addi $10 $0 56
+    and $10 $10 $2
+    sra $10 $10 3
+    #$10 now has y value
+    addi $11 $0 7
+    bne $10 $11 4
+    #If the Y position is seven, then replace piece type with queen
+    addi $10 $0 14
+    and $10 $3 $10
+    sub $3 $3 $10
+    addi $3 $3 6
+    jr $31
+
 handle_valid:
+    #If piece is a pawn, might need to edit $3
+    jal promote
     sw $3, 0($2)
     sw $0, 0($1)
     
