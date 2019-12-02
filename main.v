@@ -223,6 +223,5 @@ module main(
 								 .g_data(VGA_G),
 								 .r_data(VGA_R), 
 								 .chess_address(chess_address_vga),
-								 .chess_data(chess_data),
-								 .kp(ps2_key_pressed));
+								 .chess_data(chess_data));
 endmodule

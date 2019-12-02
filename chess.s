@@ -75,7 +75,9 @@ nop
 lw $1, 64($0)
 lw $2, 65($0)
 lw $10, 67($0)
+lw $12, 68($0)
 addi $11 $0 1
+add $10 $10 $12
 bne $10 $11 1
 j reset
 
@@ -2197,13 +2199,16 @@ handle_valid:
     addi $10, $0, 0 # address iterator $10 starts at 0
     jal startLoopCheckWin # writes $12 to 0 if opponent's king is found!
     addi $11, $0, 1
-    bne $12, $11, 1
+    bne $12, $11, 1#6#1 #WARNING: DEPENDENT ON CODE LENGTH
+##
+    # addi $10, $0, 1 # color mask
+    # and $11, $10, $30 # store new color in 11
+    # sub $11, $10, $11 # store the flipped new color (our winner color) now in 11
+    # sll $11, $11, 3
+    # add $30, $30, $11
+##
     # get this to display on the screen by writing to $30! this gets written to dmem in the next block of code
     jal markWin # this writes win status to register 30
-
-    addi $10 $0 3
-    bne $30, $10, 1
-    jal debug
 
     sw $30, 66($0) 
     #####
@@ -2240,12 +2245,117 @@ startLoopCheckWin:
     bne $15, $11, 3 #WARNING: bigger jump # of instrs dependent. If piece is not a king, go back to start of loop 
     bne $16, $13, 2 # if color is not equal to opponents color, go back to start of loop
     addi $12, $0, 0 # write 0 to $12
+    
     j endLoopCheckWin
     addi $10, $10, 1 # i = i + 1
     j startLoopCheckWin
 
 endLoopCheckWin:
+    #If $12 is 1, then a king is missing and the game is over. Else, the outcome of the game requires more computation. 
+    addi $10 $0 1
+    bne $12 $10 6#1
+    addi $10, $0, 1 # color mask
+    and $11, $10, $30 # store new color in 11
+    sub $11, $10, $11 # store the flipped new color (our winner color) now in 11
+    sll $11, $11, 3
+    add $30, $30, $11
     jr $31
+
+    addi $10 $0 4
+    and $11 $10 $30
+    bne $11 $0 1
+    jr $31
+
+    addi $10 $0 1
+    and $16 $30 $10
+    #register16 has the new turn color
+
+    #SQUARE 27
+    lw $10 27($0)
+    #extract piece
+    addi $11, $0, 14
+    and $15, $11, $10
+    sra $15, $15, 1
+    addi $14 $0 2
+    bne $15 $14 7#5 #WARNING JUMP LENGTH VARIES WITH CODE DEPTH
+    #extract piece color
+    addi $11, $0, 1
+    and $13, $11, $10
+    #Check if piece matches new turn color
+    bne $13 $16 4 #2
+
+##
+    sll $16, $16, 3
+    add $30, $30, $16
+##    
+    addi $12 $0 1
+    jr $31
+
+    #SQUARE 28
+    lw $10 28($0)
+    #extract piece
+    addi $11, $0, 14
+    and $15, $11, $10
+    sra $15, $15, 1
+    addi $14 $0 2
+    bne $15 $14 7 #WARNING JUMP LENGTH VARIES WITH CODE DEPTH
+    #extract piece color
+    addi $11, $0, 1
+    and $13, $11, $10
+    #Check if piece matches new turn color
+    bne $13 $16 4 #2
+
+##
+    sll $16, $16, 3
+    add $30, $30, $16
+##    
+    addi $12 $0 1
+    jr $31
+
+    #SQUARE 35
+    lw $10 35($0)
+    #extract piece
+    addi $11, $0, 14
+    and $15, $11, $10
+    sra $15, $15, 1
+    addi $14 $0 2
+    bne $15 $14 7 #WARNING JUMP LENGTH VARIES WITH CODE DEPTH
+    #extract piece color
+    addi $11, $0, 1
+    and $13, $11, $10
+    #Check if piece matches new turn color
+    bne $13 $16 4 #2
+
+##
+    sll $16, $16, 3
+    add $30, $30, $16
+##    
+    addi $12 $0 1
+    jr $31
+
+    #SQUARE 36
+    lw $10 36($0)
+    #extract piece
+    addi $11, $0, 14
+    and $15, $11, $10
+    sra $15, $15, 1
+    addi $14 $0 2
+    bne $15 $14 7 #WARNING JUMP LENGTH VARIES WITH CODE DEPTH
+    #extract piece color
+    addi $11, $0, 1
+    and $13, $11, $10
+    #Check if piece matches new turn color
+    bne $13 $16 4 #2
+
+##
+    sll $16, $16, 3
+    add $30, $30, $16
+##    
+    addi $12 $0 1
+    jr $31
+
+    jr $31
+
 
 reset:
     addi $10 $0 200
@@ -2263,9 +2373,16 @@ startReset:
     j startReset
 
 endReset:
-    sw $0 66($0)
+    lw $10 68($0)
     sw $0 67($0)
+    bne $10 $0 2
+    sw $0 66($0)
     j restoreColors
+    sw $0 68($0)
+    addi $10 $0 4
+    sw $10 66($0)
+    j restoreColors
+    
 # -----------------------------------------------
 # -----------------------------------------------
 # #lw 

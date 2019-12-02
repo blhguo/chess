@@ -11,9 +11,12 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 	output [11:0] keyboard_write_address;
 	
 	reg r_hit;
+	reg k_hit;
 	
-	assign keyboard_write_address = r_hit ? 12'd67 : receivingInput2 ? 12'd65 : 12'd64;
-	assign keyboard_we = (last_input_letter != 8'b0 && last_input_number != 8'b0) || r_hit;
+	assign keyboard_write_address = k_hit ? 12'd68 : 
+											  r_hit ? 12'd67 : 
+											  receivingInput2 ? 12'd65 : 12'd64;
+	assign keyboard_we = (last_input_letter != 8'b0 && last_input_number != 8'b0) || r_hit || k_hit;
 	//END OF INPUTS AND OUTPUTS
 	
 	wire key_just_released;//check if this works? interchange between ps2_key_out and ps2_key_data depending on what works
@@ -23,7 +26,7 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 	
 //	reg reg_reset;
 //	assign reg_reset = keyboard_we;
-	assign reg_reset = (last_input_letter != 8'b0 && last_input_number != 8'b0) || r_hit || reset;
+	assign reg_reset = (last_input_letter != 8'b0 && last_input_number != 8'b0) || r_hit || k_hit || reset;
 //	assign reg_reset = reset;
 
 	
@@ -37,6 +40,7 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 			last_input_letter = 8'b0;
 			last_input_number = 8'b0;
 			r_hit = 1'b0;
+			k_hit = 1'b0;
 			one_cycle_passed = 1'b0;
 			cnter = 32'd0;
 //			reg_reset = 1'b0;
@@ -62,7 +66,7 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 											: last_input_number == 8'h3D ? 3'd6
 											: last_input_number == 8'h3E ? 3'd7
 											: 3'd0;
-	assign keyboard_write_data = r_hit ? 32'd1 : {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
+	assign keyboard_write_data = k_hit ? 32'd1 : r_hit ? 32'd1 : {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
 											1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0,
 											keyboard_number_conv[2], keyboard_number_conv[1], keyboard_number_conv[0],
 											keyboard_letter_conv[2], keyboard_letter_conv[1], keyboard_letter_conv[0]};
@@ -136,6 +140,7 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 			last_input_letter = 8'h00;
 			last_input_number = 8'h00;
 			r_hit = 1'b0;
+			k_hit = 1'b0;
 		end
 		else begin
 			if (ps2_key_data == 8'h6B) begin//left arrow
@@ -170,6 +175,11 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 			end
 			else if(ps2_key_data == 8'h2D) begin //r) begin
 				r_hit = 1'b1;
+				last_input_letter = 8'h00;
+				last_input_number = 8'h00;
+			end
+			else if(ps2_key_data == 8'h42) begin //k) begin
+				k_hit = 1'b1;
 				last_input_letter = 8'h00;
 				last_input_number = 8'h00;
 			end

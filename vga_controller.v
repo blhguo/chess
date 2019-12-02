@@ -7,8 +7,7 @@ module vga_controller(iRST_n,
                       g_data,
                       r_data, 
 							 chess_address,
-							 chess_data,
-							 kp);
+							 chess_data);
 
 	
 input iRST_n;
@@ -20,8 +19,7 @@ output reg oVS;
 output [7:0] b_data;
 output [7:0] g_data;  
 output [7:0] r_data;      
-output [11:0] chess_address;
-input kp;                  
+output [11:0] chess_address;                
 ///////// ////                     
 reg [18:0] ADDR;
 reg [23:0] bgr_data;
@@ -559,11 +557,15 @@ wire [3:0] squareColor;
 wire pieceColor;
 wire playerTurn;
 wire playerWin;
+wire is_KingHill;
+wire whoWin;
 assign pieceType = dmemData[3:1];
 assign squareColor = dmemData[7:4];
 assign pieceColor = dmemData[0];
 assign playerTurn = pieceColor;
 assign playerWin = dmemData[1];
+assign is_KingHill = dmemData[2];
+assign whoWin = dmemData[3];
 
 always@(posedge iVGA_CLK) //clocking
 begin
@@ -580,14 +582,15 @@ begin
 	//								dmemAddressX[2], dmemAddressX[1], dmemAddressX[0]};
 	//			end
 			
-			if (playerWin) begin
+			if (playerWin && dmemAddress == 12'd66) begin
 				dmemAddress = 12'd66; //status address, see what color
-				if(playerTurn == 1'b1) begin //new turn is black, so winner was white
-					colorSelector = 36;
-				end
-				else begin //new turn is white, so winner was black
-					colorSelector = 37;
-				end
+//				if(playerTurn == 1'b1) begin //new turn is black, so winner was white
+//					colorSelector = whoWin ? 37 : 36;
+//				end
+//				else begin //new turn is white, so winner was black
+//					colorSelector = is_KingHill ? 36 : 37;
+//				end
+				colorSelector = whoWin ? 37 : 36;
 			end
 			else if (addressX != 192) begin
 				dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
@@ -787,13 +790,8 @@ begin
 		colorSelector = 35;
 	end
 	else begin
-		if (kp) begin
-			   colorSelector = 1;
-		end
-		else begin
 		//don't display anything, outside the bounds of the chessboard
 		colorSelector = 16;
-		end
 	end
 	
 end
