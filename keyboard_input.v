@@ -119,7 +119,7 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 	always @(posedge clock)
 	begin
 		if (reg_reset == 1'b1) begin
-			if (cnter >= 32'd100) begin
+			if (cnter >= 32'd150) begin
 				one_cycle_passed = 1'b1;
 				cnter <= 32'd0;
 			end
@@ -131,7 +131,17 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 			one_cycle_passed = 1'b0;
 		end
 	end
-
+//	always @(posedge clock)
+//	begin
+//		if (reg_reset == 1'b1) begin
+//			if (~ps2_key_pressed) begin
+//				one_cycle_passed = 1'b1;
+//			end
+//		end
+//		else begin
+//			one_cycle_passed = 1'b0;
+//		end
+//	end
 	
 	//the ting???
 	always @(posedge ps2_key_pressed or posedge one_cycle_passed)

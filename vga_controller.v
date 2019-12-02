@@ -791,7 +791,7 @@ begin
 			colorSelector = 40;
 		end
 		else if(is_KingHill && index_koh != 0) begin
-			colorSelector = 41
+			colorSelector = 41;
 		end
 		else begin
 			colorSelector = 16;
