@@ -2449,6 +2449,8 @@ startReset:
     j startReset
 
 endReset:
+    addi $10 $0 -1
+    sw $10 69($0)
     lw $10 68($0)
     sw $0 67($0)
     bne $10 $0 2
