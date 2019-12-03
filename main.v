@@ -118,11 +118,11 @@ module main(
 	 
 	 wire [41:0] black_clock;
 	 wire [41:0] white_clock;
-
+	 wire [31:0] dmem66backwire;
 	 wire winner, winnerEnable;
 	 keyboard_input keyboard_wrapper(CLOCK_50,1'b0, ps2_key_data, ps2_key_pressed, ps2_out, 
 			keyboard_we, keyboard_write_data, keyboard_write_address,
-			chess_address, chess_data, black_clock, white_clock, winner, winnerEnable);
+			chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmem66backwire);
 	 
 //	 assign temp_we = chess_address == 36 && DEBUG_button_clicked ? 1'b1 : 1'b0;
 //	 assign temp_we = chess_address == 36 && ps2_out == 8'h6B;
@@ -227,5 +227,6 @@ module main(
 								 .g_data(VGA_G),
 								 .r_data(VGA_R), 
 								 .chess_address(chess_address_vga),
-								 .chess_data(chess_data), .winnerKB(winner), .winnerEnableKB(winnerEnable), .white_clock(white_clock), .black_clock(black_clock));
+								 .chess_data(chess_data), .winnerKB(winner), .winnerEnableKB(winnerEnable), .white_clock(white_clock), .black_clock(black_clock),
+								 .dmem66backwire(dmem66backwire));
 endmodule

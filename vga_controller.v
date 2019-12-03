@@ -7,13 +7,14 @@ module vga_controller(iRST_n,
                       g_data,
                       r_data, 
 							 chess_address,
-							 chess_data, winnerKB, winnerEnableKB, white_clock, black_clock);
+							 chess_data, winnerKB, winnerEnableKB, white_clock, black_clock, dmem66backwire);
 
 	
 input [41:0] white_clock, black_clock;
 input iRST_n;
 input iVGA_CLK;
 input [31:0] chess_data;
+input [31:0] dmem66backwire;
 output reg oBLANK_n;
 output reg oHS;
 output reg oVS;
@@ -714,7 +715,7 @@ assign chess_address = dmemAddress;
 reg [6:0] colorSelector;
 assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 1 ? 24'hCDE1F7 : //light brown like not simran
-					colorSelector == 2 ? 24'hEF330B : //red
+					colorSelector == 2 ? 24'h0B33EF : //red
 					colorSelector == 3 ? 24'h41B963 : //green
 					colorSelector == 4 ? bgr_data_raw_wkn : //white knight
 					colorSelector == 5 ? bgr_data_raw_wki : //white king
@@ -754,6 +755,8 @@ assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 39 ? bgr_data_raw_instr: //instructions
 					colorSelector == 40 ? bgr_data_raw_cchess: //classic chess mode
 					colorSelector == 41 ? bgr_data_raw_koh: //koh mode
+					colorSelector == 42 ? 24'h730C5B: //purple brown
+					colorSelector == 43 ? 24'hF69DE1: //purple white
 					24'hF5A442; //light blue background
 					
 
@@ -867,10 +870,20 @@ begin
 				end
 				//figure out the square color
 				else	if (squareColor == 4'b1000) begin //black
-					colorSelector = 0;
+					if(dmem66backwire[2] && addressX > 256 & addressX <= 384 && addressY >= 256 && addressY < 384) begin
+						colorSelector = 42;
+					end
+					else begin
+						colorSelector = 0;
+					end
 				end
 				else if (squareColor == 4'b0100) begin  //white
-					colorSelector = 1;
+					if(dmem66backwire[2] && addressX > 256 & addressX <= 384 && addressY >= 256 && addressY < 384) begin
+						colorSelector = 43;
+					end
+					else begin
+						colorSelector = 1;
+					end
 				end
 				else if (squareColor == 4'b0010) begin  //red
 					colorSelector = 2;

@@ -1,6 +1,6 @@
 module keyboard_input(clock, reset, ps2_key_data, ps2_key_pressed, ps2_out, 
 keyboard_we, keyboard_write_data, keyboard_write_address, 
-chess_address, chess_data, black_clock, white_clock, winner, winnerEnable);
+chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemDataOutAt66);
 
 	//INPUTS FROM MAIN
 	input [11:0] chess_address;
@@ -20,6 +20,8 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable);
 	output keyboard_we;
 	output [31:0] keyboard_write_data;
 	output [11:0] keyboard_write_address;
+	
+	output [31:0] dmemDataOutAt66;
 	
 	reg r_hit;
 	reg k_hit;
@@ -64,8 +66,8 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable);
 			//clock
 			winnerEnable = 1'b0;
 			winner = 1'b1;
-			white_clock = 41'd15000000000;
-			black_clock = 41'd15000000000;
+			white_clock = 41'd15049999999;
+			black_clock = 41'd15049999999;
 			dmemDataOutAt66 = 32'd0;
 	
 	end
@@ -146,8 +148,8 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable);
 		if(k_hit || r_hit) begin
 			winnerEnable = 1'b0;
 			winner = 1'b1;
-			white_clock = 41'd15000000000;
-			black_clock = 41'd15000000000;
+			white_clock = 41'd15049999999;
+			black_clock = 41'd15049999999;
 			dmemDataOutAt66 = 32'd0;
 		end
 		if (reg_reset == 1'b1) begin
@@ -204,7 +206,17 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable);
 			r_hit = 1'b0;
 			k_hit = 1'b0;
 		end
-		else begin
+		else if(ps2_key_data == 8'h2D) begin //r) begin
+			r_hit = 1'b1;
+			last_input_letter = 8'h00;
+			last_input_number = 8'h00;
+		end
+		else if(ps2_key_data == 8'h42) begin //k) begin
+			k_hit = 1'b1;
+			last_input_letter = 8'h00;
+			last_input_number = 8'h00;
+		end
+		else if(~winnerEnable && ~dmemDataOutAt66[1]) begin
 			if (ps2_key_data == 8'h6B) begin//left arrow
 				receivingInput2 = 1'b0;
 				last_input_letter = 8'h00;
@@ -234,16 +246,6 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable);
 					|| ps2_key_data == 8'h3D//7
 					|| ps2_key_data == 8'h3E) begin//8)
 				last_input_number = ps2_key_data;
-			end
-			else if(ps2_key_data == 8'h2D) begin //r) begin
-				r_hit = 1'b1;
-				last_input_letter = 8'h00;
-				last_input_number = 8'h00;
-			end
-			else if(ps2_key_data == 8'h42) begin //k) begin
-				k_hit = 1'b1;
-				last_input_letter = 8'h00;
-				last_input_number = 8'h00;
 			end
 		end
 	end
