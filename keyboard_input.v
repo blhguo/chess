@@ -160,7 +160,7 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 			dmemDataOutAt66 = 32'd0;
 		end
 		if (reg_reset == 1'b1) begin
-			if (cnter >= 32'd150) begin
+			if (cnter >= 32'd203) begin
 				one_cycle_passed = 1'b1;
 				cnter = 32'd0;
 			end
