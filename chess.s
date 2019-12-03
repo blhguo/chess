@@ -2459,9 +2459,14 @@ endReset:
     sw $10 69($0)
     lw $10 68($0)
     sw $0 67($0)
-    sw $0 70($0)
+    bne $10 $0 8 #WARNING THIS NUMBER IS LINE COUNT DEPENDENT
+    lw $10 70($0)
     bne $10 $0 2
     sw $0 66($0)
+    j restoreColors
+    addi $10 $0 16
+    sw $0 70($0)
+    sw $10 66($0)
     j restoreColors
     sw $0 68($0)
     addi $10 $0 4
