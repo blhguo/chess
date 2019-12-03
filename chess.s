@@ -74,10 +74,12 @@ nop
 
 lw $1, 64($0)
 lw $2, 65($0)
-lw $10, 67($0)
-lw $12, 68($0)
+lw $10, 67($0) #RHIT
+lw $12, 68($0) #KHIT
+lw $13 70($0) #LHIT
 addi $11 $0 1
 add $10 $10 $12
+add $10 $10 $13
 bne $10 $11 1
 j reset
 
@@ -2434,7 +2436,11 @@ endLoopCheckWin:
 
 
 reset:
+    lw $14 70($0)
     addi $10 $0 200
+    bne $0 $14 1
+    sub $10 $10 $10
+    addi $10 $10 200
     addi $11 $0 0
     addi $13 $0 64
     j startReset
@@ -2453,6 +2459,7 @@ endReset:
     sw $10 69($0)
     lw $10 68($0)
     sw $0 67($0)
+    sw $0 70($0)
     bne $10 $0 2
     sw $0 66($0)
     j restoreColors
