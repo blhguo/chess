@@ -25,11 +25,13 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 	
 	reg r_hit;
 	reg k_hit;
+	reg l_hit;
 	
-	assign keyboard_write_address = k_hit ? 12'd68 : 
+	assign keyboard_write_address = l_hit ? 12'd70 : 
+											  k_hit ? 12'd68 : 
 											  r_hit ? 12'd67 : 
 											  receivingInput2 ? 12'd65 : 12'd64;
-	assign keyboard_we = (last_input_letter != 8'b0 && last_input_number != 8'b0) || r_hit || k_hit;
+	assign keyboard_we = (last_input_letter != 8'b0 && last_input_number != 8'b0) || r_hit || k_hit || l_hit;
 	//END OF INPUTS AND OUTPUTS
 	
 	wire key_just_released;//check if this works? interchange between ps2_key_out and ps2_key_data depending on what works
@@ -39,7 +41,7 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 	
 //	reg reg_reset;
 //	assign reg_reset = keyboard_we;
-	assign reg_reset = (last_input_letter != 8'b0 && last_input_number != 8'b0) || r_hit || k_hit || reset;
+	assign reg_reset = (last_input_letter != 8'b0 && last_input_number != 8'b0) || r_hit || k_hit || l_hit || reset;
 //	assign reg_reset = reset;
 
 	//TIMER INIT
@@ -59,6 +61,7 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 			last_input_number = 8'b0;
 			r_hit = 1'b0;
 			k_hit = 1'b0;
+			l_hit = 1'b0;
 			one_cycle_passed = 1'b0;
 			cnter = 32'd0;
 //			reg_reset = 1'b0;	
@@ -92,7 +95,7 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 											: last_input_number == 8'h3D ? 3'd6
 											: last_input_number == 8'h3E ? 3'd7
 											: 3'd0;
-	assign keyboard_write_data = k_hit ? 32'd1 : r_hit ? 32'd1 : {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
+	assign keyboard_write_data = l_hit ? 32'd1 : k_hit ? 32'd1 : r_hit ? 32'd1 : {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
 											1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0,
 											keyboard_number_conv[2], keyboard_number_conv[1], keyboard_number_conv[0],
 											keyboard_letter_conv[2], keyboard_letter_conv[1], keyboard_letter_conv[0]};
@@ -145,7 +148,7 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 	
 	always @(posedge clock)
 	begin
-		if(k_hit || r_hit) begin
+		if(k_hit || r_hit || l_hit) begin
 			winnerEnable = 1'b0;
 			winner = 1'b1;
 			white_clock = 41'd15049999999;
@@ -205,6 +208,7 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 			last_input_number = 8'h00;
 			r_hit = 1'b0;
 			k_hit = 1'b0;
+			l_hit = 1'b0;
 		end
 		else if(ps2_key_data == 8'h2D) begin //r) begin
 			r_hit = 1'b1;
@@ -213,6 +217,11 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 		end
 		else if(ps2_key_data == 8'h42) begin //k) begin
 			k_hit = 1'b1;
+			last_input_letter = 8'h00;
+			last_input_number = 8'h00;
+		end
+		else if(ps2_key_data == 8'h4B) begin //l) begin
+			l_hit = 1'b1;
 			last_input_letter = 8'h00;
 			last_input_number = 8'h00;
 		end
