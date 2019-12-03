@@ -76,6 +76,8 @@ assign VGA_CLK_n = ~iVGA_CLK;
 START OF CHESS IMAGES
 */
 
+wire [41:0] white_secs, white_secs_tens_ones, white_secs_ones, white_secs_tens, white_mins;
+wire [41:0] black_secs, black_secs_tens_ones, black_secs_ones, black_secs_tens, black_mins;
 
 
 /*
@@ -519,6 +521,8 @@ wire [7:0] index_cchess;
 wire [23:0] bgr_data_raw_cchess;
 wire [7:0] index_koh;
 wire [23:0] bgr_data_raw_koh;
+wire [7:0] index_lb;
+wire [23:0] bgr_data_raw_lb;
 cchess_data	cchess_data_inst (
 	.address ( gameModeADDR ),
 	.clock ( VGA_CLK_n ),
@@ -538,6 +542,16 @@ koh_index	koh_index_inst (
 	.address ( index_koh ),
 	.clock ( iVGA_CLK ),
 	.q ( bgr_data_raw_koh)
+	);	
+lb_data	lb_data_inst (
+	.address ( gameModeADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_lb )
+	);
+lb_index	lb_index_inst (
+	.address ( index_lb ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_lb)
 	);	
 
 //instructions image
@@ -729,7 +743,7 @@ assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 13 ? bgr_data_raw_bb : //black bishop
 					colorSelector == 14 ? bgr_data_raw_br : //black rook
 					colorSelector == 15 ? bgr_data_raw_bp : //black pawn
-					colorSelector == 16 ? 24'hF5A442 : //light blue background
+					colorSelector == 16 ? dmem66backwire[1] || winnerEnableKB ? 24'h808080 : (white_mins == 0 && ~dmem66backwire[0]) || (black_mins == 0 && dmem66backwire[0]) ? 24'h0B33EF : 24'hF5A442 : //light blue background
 					colorSelector == 17 ? 24'hFFFFFF : //white's turn background color square
 					colorSelector == 18 ? 24'h000000 : //black's turn background color square
 					colorSelector == 19 ? bgr_data_raw_a: //letter a
@@ -757,6 +771,7 @@ assign bgr_data_raw = colorSelector == 0 ? 24'h446999 : //dark brown like simran
 					colorSelector == 41 ? bgr_data_raw_koh: //koh mode
 					colorSelector == 42 ? 24'h730C5B: //purple brown
 					colorSelector == 43 ? 24'hF69DE1: //purple white
+					colorSelector == 44 ? bgr_data_raw_lb://light brigade mode
 					24'hF5A442; //light blue background
 					
 
@@ -769,6 +784,7 @@ wire playerTurn;
 wire playerWin;
 wire is_KingHill;
 wire whoWin;
+wire is_lb;
 assign pieceType = dmemData[3:1];
 assign squareColor = dmemData[7:4];
 assign pieceColor = dmemData[0];
@@ -776,16 +792,15 @@ assign playerTurn = pieceColor;
 assign playerWin = dmemData[1];
 assign is_KingHill = dmemData[2];
 assign whoWin = dmemData[3];
+assign is_lb = dmemData[4];
 
 //MATH TO DISPLAY TIMERS
-wire [41:0] white_secs, white_secs_tens_ones, white_secs_ones, white_secs_tens, white_mins;
 assign white_secs = white_clock / 50000000;
 assign white_secs_tens_ones = white_secs % 60;
 assign white_secs_ones = white_secs_tens_ones % 10;
 assign white_secs_tens = white_secs_tens_ones / 10;
 assign white_mins = white_secs / 60;
 
-wire [41:0] black_secs, black_secs_tens_ones, black_secs_ones, black_secs_tens, black_mins;
 assign black_secs = black_clock / 50000000;
 assign black_secs_tens_ones = black_secs % 60;
 assign black_secs_ones = black_secs_tens_ones % 10;
@@ -798,31 +813,31 @@ always@(posedge iVGA_CLK) //clocking
 begin
 	if (addressX >= 64 && addressX <= 576 && addressY >= 64 && addressY < 576) begin
 		if (addressX >= 192 & addressX <= 448 && addressY >= 256 && addressY < 384) begin
-			if (addressX == 192 ) begin
-				dmemAddress = 12'd66;
-			end
-	//			else begin
-	//				dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
-	//				dmemAddressY = 7 - ((addressY - 64) >> 6);
-	//				dmemAddress = {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
-	//								dmemAddressY[2], dmemAddressY[1], dmemAddressY[0], 
-	//								dmemAddressX[2], dmemAddressX[1], dmemAddressX[0]};
-	//			end
+//			if (addressX == 192 ) begin
+//				dmemAddress = 12'd66;
+//			end
+//	//			else begin
+//	//				dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
+//	//				dmemAddressY = 7 - ((addressY - 64) >> 6);
+//	//				dmemAddress = {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
+//	//								dmemAddressY[2], dmemAddressY[1], dmemAddressY[0], 
+//	//								dmemAddressX[2], dmemAddressX[1], dmemAddressX[0]};
+//	//			end
 			
 			if(winnerEnableKB) begin
 				colorSelector = winnerKB ? 37 : 36;
 			end
-			else if (playerWin && dmemAddress == 12'd66) begin
-				dmemAddress = 12'd66; //status address, see what color
+			else if (dmem66backwire[1]) begin
+//				dmemAddress = 12'd66; //status address, see what color
 //				if(playerTurn == 1'b1) begin //new turn is black, so winner was white
 //					colorSelector = whoWin ? 37 : 36;
 //				end
 //				else begin //new turn is white, so winner was black
 //					colorSelector = is_KingHill ? 36 : 37;
 //				end
-				colorSelector = whoWin ? 37 : 36;
+				colorSelector = dmem66backwire[3] ? 37 : 36;
 			end
-			else if (addressX != 192) begin
+			else begin
 				dmemAddressX = (addressX - 64) >> 6; //(x-64)/64
 				dmemAddressY = 7 - ((addressY - 64) >> 6);
 				dmemAddress = {1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 
@@ -969,15 +984,18 @@ begin
 	else if(addressX >= 592 && addressX <= 624 && addressY >= 128 && addressY < 512 && index_instr != 0) begin
 		colorSelector = 39;
 	end
-	//possible modes: classic chess and king of the hill
+	//possible modes: classic chess and king of the hill and light brigade
 	//instructions display
 	else if(addressX >= 448 && addressX <= 576 && addressY >= 16 && addressY < 48) begin
 		dmemAddress = 12'd66;
-		if(~is_KingHill && index_cchess != 0) begin
+		if(~is_KingHill && ~is_lb && index_cchess != 0) begin
 			colorSelector = 40;
 		end
 		else if(is_KingHill && index_koh != 0) begin
 			colorSelector = 41;
+		end
+		else if(is_lb && index_lb != 0) begin
+			colorSelector = 44;
 		end
 		else begin
 			colorSelector = 16;
@@ -1135,7 +1153,7 @@ begin
 
 	////////end of clock stuff
 	else begin
-		//don't display anything, outside the bounds of the chessboard
+		//background
 		colorSelector = 16;
 	end
 	

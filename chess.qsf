@@ -167,6 +167,10 @@ set_location_assignment PIN_G20 -to leds[5]
 set_location_assignment PIN_G22 -to leds[6]
 set_location_assignment PIN_G21 -to leds[7]
 set_location_assignment PIN_AB28 -to DEBUG_button_clicked
+set_global_assignment -name MIF_FILE lb_index.mif
+set_global_assignment -name MIF_FILE lb_data.mif
+set_global_assignment -name VERILOG_FILE lb_index.v
+set_global_assignment -name VERILOG_FILE lb_data.v
 set_global_assignment -name VERILOG_FILE clock_colon_index.v
 set_global_assignment -name VERILOG_FILE clock_colon_data.v
 set_global_assignment -name VERILOG_FILE clock_9_index.v

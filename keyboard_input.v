@@ -69,8 +69,10 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 			//clock
 			winnerEnable = 1'b0;
 			winner = 1'b1;
-			white_clock = 41'd15049999999;
-			black_clock = 41'd15049999999;
+			white_clock = 41'd6049999999;
+			black_clock = 41'd6049999999;
+//			white_clock = 41'd15000000000;
+//			black_clock = 41'd15000000000;
 			dmemDataOutAt66 = 32'd0;
 	
 	end
@@ -151,8 +153,10 @@ chess_address, chess_data, black_clock, white_clock, winner, winnerEnable, dmemD
 		if(k_hit || r_hit || l_hit) begin
 			winnerEnable = 1'b0;
 			winner = 1'b1;
-			white_clock = 41'd15049999999;
-			black_clock = 41'd15049999999;
+			white_clock = 41'd6049999999;
+			black_clock = 41'd6049999999;
+//			white_clock = 41'd15000000000;
+//			black_clock = 41'd15000000000;
 			dmemDataOutAt66 = 32'd0;
 		end
 		if (reg_reset == 1'b1) begin
