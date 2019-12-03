@@ -7,9 +7,10 @@ module vga_controller(iRST_n,
                       g_data,
                       r_data, 
 							 chess_address,
-							 chess_data);
+							 chess_data, winnerKB, winnerEnableKB, white_clock, black_clock);
 
 	
+input [41:0] white_clock, black_clock;
 input iRST_n;
 input iVGA_CLK;
 input [31:0] chess_data;
@@ -19,7 +20,11 @@ output reg oVS;
 output [7:0] b_data;
 output [7:0] g_data;  
 output [7:0] r_data;      
-output [11:0] chess_address;                
+output [11:0] chess_address;
+
+input winnerKB;
+input winnerEnableKB;
+    
 ///////// ////                     
 reg [18:0] ADDR;
 reg [23:0] bgr_data;
@@ -27,7 +32,7 @@ wire VGA_CLK_n;
 wire [7:0] index;
 wire [23:0] bgr_data_raw;
 wire cBLANK_n,cHS,cVS,rst;
-////
+
 assign rst = ~iRST_n;
 video_sync_generator LTM_ins (.vga_clk(iVGA_CLK),
                               .reset(rst),
@@ -553,6 +558,154 @@ instructions_index	instructions_index_inst (
 	.clock ( iVGA_CLK ),
 	.q ( bgr_data_raw_instr)
 	);	
+	
+//clock stuff
+wire [7:0] clockNumAddressX, clockNumAddressY;
+				
+assign clockNumAddressX = (addressX) % 16;
+assign clockNumAddressY = (addressY - 24) % 16;
+
+wire [7:0] clockNumADDR;
+assign clockNumADDR = clockNumAddressY*16 + clockNumAddressX;
+
+//clock stuff vga
+wire [7:0] index_clock_0;
+wire [7:0] index_clock_1;
+wire [7:0] index_clock_2;
+wire [7:0] index_clock_3;
+wire [7:0] index_clock_4;
+wire [7:0] index_clock_5;
+wire [7:0] index_clock_6;
+wire [7:0] index_clock_7;
+wire [7:0] index_clock_8;
+wire [7:0] index_clock_9;
+wire [7:0] index_clock_colon;
+
+wire [23:0] bgr_data_raw_clock_0;
+wire [23:0] bgr_data_raw_clock_1;
+wire [23:0] bgr_data_raw_clock_2;
+wire [23:0] bgr_data_raw_clock_3;
+wire [23:0] bgr_data_raw_clock_4;
+wire [23:0] bgr_data_raw_clock_5;
+wire [23:0] bgr_data_raw_clock_6;
+wire [23:0] bgr_data_raw_clock_7;
+wire [23:0] bgr_data_raw_clock_8;
+wire [23:0] bgr_data_raw_clock_9;
+wire [23:0] bgr_data_raw_clock_colon;
+
+clock_0_data	clock_0_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_0 )
+	);
+clock_0_index	clock_0_index_inst (
+	.address ( index_clock_0 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_0)
+	);		
+
+clock_1_data	clock_1_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_1 )
+	);
+clock_1_index	clock_1_index_inst (
+	.address ( index_clock_1 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_1)
+	);	
+	
+clock_2_data	clock_2_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_2 )
+	);
+clock_2_index	clock_2_index_inst (
+	.address ( index_clock_2 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_2)
+	);	
+
+clock_3_data	clock_3_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_3 )
+	);
+clock_3_index	clock_3_index_inst (
+	.address ( index_clock_3 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_3)
+	);	
+clock_4_data	clock_4_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_4 )
+	);
+clock_4_index	clock_4_index_inst (
+	.address ( index_clock_4 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_4)
+	);	
+clock_5_data	clock_5_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_5 )
+	);
+clock_5_index	clock_5_index_inst (
+	.address ( index_clock_5 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_5)
+	);	
+clock_6_data	clock_6_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_6 )
+	);
+clock_6_index	clock_6_index_inst (
+	.address ( index_clock_6 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_6)
+	);	
+clock_7_data	clock_7_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_7 )
+	);
+clock_7_index	clock_7_index_inst (
+	.address ( index_clock_7 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_7)
+	);	
+clock_8_data	clock_8_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_8 )
+	);
+clock_8_index	clock_8_index_inst (
+	.address ( index_clock_8 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_8)
+	);	
+clock_9_data	clock_9_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_9 )
+	);
+clock_9_index	clock_9_index_inst (
+	.address ( index_clock_9 ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_9)
+	);	
+clock_colon_data	clock_colon_data_inst (
+	.address ( clockNumADDR ),
+	.clock ( VGA_CLK_n ),
+	.q ( index_clock_colon )
+	);
+clock_colon_index	clock_colon_index_inst (
+	.address ( index_clock_colon ),
+	.clock ( iVGA_CLK ),
+	.q ( bgr_data_raw_clock_colon)
+	);	
 
 reg [11:0] dmemAddress, dmemAddressX, dmemAddressY;
 assign chess_address = dmemAddress;
@@ -621,6 +774,23 @@ assign playerWin = dmemData[1];
 assign is_KingHill = dmemData[2];
 assign whoWin = dmemData[3];
 
+//MATH TO DISPLAY TIMERS
+wire [41:0] white_secs, white_secs_tens_ones, white_secs_ones, white_secs_tens, white_mins;
+assign white_secs = white_clock / 50000000;
+assign white_secs_tens_ones = white_secs % 60;
+assign white_secs_ones = white_secs_tens_ones % 10;
+assign white_secs_tens = white_secs_tens_ones / 10;
+assign white_mins = white_secs / 60;
+
+wire [41:0] black_secs, black_secs_tens_ones, black_secs_ones, black_secs_tens, black_mins;
+assign black_secs = black_clock / 50000000;
+assign black_secs_tens_ones = black_secs % 60;
+assign black_secs_ones = black_secs_tens_ones % 10;
+assign black_secs_tens = black_secs_tens_ones / 10;
+assign black_mins = black_secs / 60;
+
+
+
 always@(posedge iVGA_CLK) //clocking
 begin
 	if (addressX >= 64 && addressX <= 576 && addressY >= 64 && addressY < 576) begin
@@ -636,7 +806,10 @@ begin
 	//								dmemAddressX[2], dmemAddressX[1], dmemAddressX[0]};
 	//			end
 			
-			if (playerWin && dmemAddress == 12'd66) begin
+			if(winnerEnableKB) begin
+				colorSelector = winnerKB ? 37 : 36;
+			end
+			else if (playerWin && dmemAddress == 12'd66) begin
 				dmemAddress = 12'd66; //status address, see what color
 //				if(playerTurn == 1'b1) begin //new turn is black, so winner was white
 //					colorSelector = whoWin ? 37 : 36;
@@ -861,6 +1034,93 @@ begin
 	else if (addressY >= 0 & addressY <= 64 & addressX >= 64 && addressX < 128 && index_turn != 0) begin
 		colorSelector = 35;
 	end
+	////////clock stuff
+	else if (addressY >= 24 && addressY <= 40 && addressX >= 224 && addressX < 240) begin //white minutes
+		colorSelector = white_mins == 9 && index_clock_9 != 0 ? 17 :
+								white_mins == 8 && index_clock_8 != 0 ? 17 :
+								white_mins == 7 && index_clock_7 != 0 ? 17 :
+								white_mins == 6 && index_clock_6 != 0 ? 17 :
+								white_mins == 5 && index_clock_5 != 0 ? 17 :
+								white_mins == 4 && index_clock_4 != 0 ? 17 :
+								white_mins == 3 && index_clock_3 != 0 ? 17 :
+								white_mins == 2 && index_clock_2 != 0 ? 17 :
+								white_mins == 1 && index_clock_1 != 0 ? 17 :
+								white_mins == 0 && index_clock_0 != 0 ? 17 :
+								16;
+	end
+	else if (addressY >= 24 && addressY <= 40 && addressX >= 240 && addressX < 256) begin //white colon
+		colorSelector = index_clock_colon != 0 ? 17 : 16;
+	end
+	else if (addressY >= 24 && addressY <= 40 && addressX >= 256 && addressX < 272) begin //white ten seconds
+		colorSelector = white_secs_tens == 9 && index_clock_9 != 0 ? 17 :
+								white_secs_tens == 8 && index_clock_8 != 0 ? 17 :
+								white_secs_tens == 7 && index_clock_7 != 0 ? 17 :
+								white_secs_tens == 6 && index_clock_6 != 0 ? 17 :
+								white_secs_tens == 5 && index_clock_5 != 0 ? 17 :
+								white_secs_tens == 4 && index_clock_4 != 0 ? 17 :
+								white_secs_tens == 3 && index_clock_3 != 0 ? 17 :
+								white_secs_tens == 2 && index_clock_2 != 0 ? 17 :
+								white_secs_tens == 1 && index_clock_1 != 0 ? 17 :
+								white_secs_tens == 0 && index_clock_0 != 0 ? 17 :
+								16;
+	end
+	else if (addressY >= 24 && addressY <= 40 && addressX >= 272 && addressX < 288) begin //white one seconds
+		colorSelector = white_secs_ones == 9 && index_clock_9 != 0 ? 17 :
+								white_secs_ones == 8 && index_clock_8 != 0 ? 17 :
+								white_secs_ones == 7 && index_clock_7 != 0 ? 17 :
+								white_secs_ones == 6 && index_clock_6 != 0 ? 17 :
+								white_secs_ones == 5 && index_clock_5 != 0 ? 17 :
+								white_secs_ones == 4 && index_clock_4 != 0 ? 17 :
+								white_secs_ones == 3 && index_clock_3 != 0 ? 17 :
+								white_secs_ones == 2 && index_clock_2 != 0 ? 17 :
+								white_secs_ones == 1 && index_clock_1 != 0 ? 17 :
+								white_secs_ones == 0 && index_clock_0 != 0 ? 17 :
+								16;
+	end
+	else if (addressY >= 24 && addressY <= 40 && addressX >= 352 && addressX < 368) begin //black minutes
+		colorSelector = black_mins == 9 && index_clock_9 != 0 ? 18 :
+								black_mins == 8 && index_clock_8 != 0 ? 18 :
+								black_mins == 7 && index_clock_7 != 0 ? 18 :
+								black_mins == 6 && index_clock_6 != 0 ? 18 :
+								black_mins == 5 && index_clock_5 != 0 ? 18 :
+								black_mins == 4 && index_clock_4 != 0 ? 18 :
+								black_mins == 3 && index_clock_3 != 0 ? 18 :
+								black_mins == 2 && index_clock_2 != 0 ? 18 :
+								black_mins == 1 && index_clock_1 != 0 ? 18 :
+								black_mins == 0 && index_clock_0 != 0 ? 18 :
+								16;
+	end
+	else if (addressY >= 24 && addressY <= 40 && addressX >= 368 && addressX < 384) begin //black colon
+		colorSelector = index_clock_colon != 0 ? 18 : 16;
+	end
+	else if (addressY >= 24 && addressY <= 40 && addressX >= 384 && addressX < 400) begin //black ten seconds
+		colorSelector = black_secs_tens == 9 && index_clock_9 != 0 ? 18 :
+								black_secs_tens == 8 && index_clock_8 != 0 ? 18 :
+								black_secs_tens == 7 && index_clock_7 != 0 ? 18 :
+								black_secs_tens == 6 && index_clock_6 != 0 ? 18 :
+								black_secs_tens == 5 && index_clock_5 != 0 ? 18 :
+								black_secs_tens == 4 && index_clock_4 != 0 ? 18 :
+								black_secs_tens == 3 && index_clock_3 != 0 ? 18 :
+								black_secs_tens == 2 && index_clock_2 != 0 ? 18 :
+								black_secs_tens == 1 && index_clock_1 != 0 ? 18 :
+								black_secs_tens == 0 && index_clock_0 != 0 ? 18 :
+								16;
+	end
+	else if (addressY >= 24 && addressY <= 40 && addressX >= 400 && addressX < 416) begin //black one seconds
+		colorSelector = black_secs_ones == 9 && index_clock_9 != 0 ? 18 :
+								black_secs_ones == 8 && index_clock_8 != 0 ? 18 :
+								black_secs_ones == 7 && index_clock_7 != 0 ? 18 :
+								black_secs_ones == 6 && index_clock_6 != 0 ? 18 :
+								black_secs_ones == 5 && index_clock_5 != 0 ? 18 :
+								black_secs_ones == 4 && index_clock_4 != 0 ? 18 :
+								black_secs_ones == 3 && index_clock_3 != 0 ? 18 :
+								black_secs_ones == 2 && index_clock_2 != 0 ? 18 :
+								black_secs_ones == 1 && index_clock_1 != 0 ? 18 :
+								black_secs_ones == 0 && index_clock_0 != 0 ? 18 :
+								16;
+	end
+
+	////////end of clock stuff
 	else begin
 		//don't display anything, outside the bounds of the chessboard
 		colorSelector = 16;

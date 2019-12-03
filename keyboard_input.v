@@ -1,11 +1,22 @@
 module keyboard_input(clock, reset, ps2_key_data, ps2_key_pressed, ps2_out, 
-keyboard_we, keyboard_write_data, keyboard_write_address);
+keyboard_we, keyboard_write_data, keyboard_write_address, 
+chess_address, chess_data, black_clock, white_clock, winner, winnerEnable);
+
+	//INPUTS FROM MAIN
+	input [11:0] chess_address;
+	input [31:0] chess_data;
+	
+	//Regular Inputs
 	input clock, reset; //global reset???
 	
 	input	[7:0]	 ps2_key_data;
 	input			 ps2_key_pressed;
 	input	[7:0]	 ps2_out;
-
+	
+	
+	output [41:0] black_clock, white_clock;
+	output reg winner, winnerEnable;
+	
 	output keyboard_we;
 	output [31:0] keyboard_write_data;
 	output [11:0] keyboard_write_address;
@@ -29,6 +40,11 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 	assign reg_reset = (last_input_letter != 8'b0 && last_input_number != 8'b0) || r_hit || k_hit || reset;
 //	assign reg_reset = reset;
 
+	//TIMER INIT
+	reg [41:0] white_clock;
+	reg [41:0] black_clock;
+	reg [31:0] dmemDataOutAt66;
+	
 	
 	reg receivingInput2;
 	
@@ -43,7 +59,15 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 			k_hit = 1'b0;
 			one_cycle_passed = 1'b0;
 			cnter = 32'd0;
-//			reg_reset = 1'b0;
+//			reg_reset = 1'b0;	
+
+			//clock
+			winnerEnable = 1'b0;
+			winner = 1'b1;
+			white_clock = 41'd15000000000;
+			black_clock = 41'd15000000000;
+			dmemDataOutAt66 = 32'd0;
+	
 	end
 	
 	wire [2:0] keyboard_letter_conv;
@@ -116,19 +140,47 @@ keyboard_we, keyboard_write_data, keyboard_write_address);
 //	end
 	
 	
+	
 	always @(posedge clock)
 	begin
+		if(k_hit || r_hit) begin
+			winnerEnable = 1'b0;
+			winner = 1'b1;
+			white_clock = 41'd15000000000;
+			black_clock = 41'd15000000000;
+			dmemDataOutAt66 = 32'd0;
+		end
 		if (reg_reset == 1'b1) begin
 			if (cnter >= 32'd150) begin
 				one_cycle_passed = 1'b1;
-				cnter <= 32'd0;
+				cnter = 32'd0;
 			end
 			else begin
-				cnter <= cnter + 1;
+				cnter = cnter + 1;
 			end
 		end
 		else begin
 			one_cycle_passed = 1'b0;
+		end
+		
+		
+		//counter clock stuff
+		if (chess_address == 12'd66) begin
+			dmemDataOutAt66 = chess_data;
+		end
+		if (white_clock <= 0 || black_clock <= 0) begin
+			winnerEnable = 1'b1;
+			if (black_clock <=0) begin
+				winner = 0;
+			end
+		end
+		else if(~winnerEnable && ~dmemDataOutAt66[1]) begin
+			if (~dmemDataOutAt66[0]) begin
+				white_clock = white_clock - 1;
+			end
+			else begin
+				black_clock = black_clock - 1;
+			end
 		end
 	end
 //	always @(posedge clock)

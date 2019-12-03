@@ -115,9 +115,14 @@ module main(
 	 wire keyboard_we;
 	 wire [31:0] keyboard_write_data;
 	 wire [11:0] keyboard_write_address;
+	 
+	 wire [41:0] black_clock;
+	 wire [41:0] white_clock;
 
+	 wire winner, winnerEnable;
 	 keyboard_input keyboard_wrapper(CLOCK_50,1'b0, ps2_key_data, ps2_key_pressed, ps2_out, 
-			keyboard_we, keyboard_write_data, keyboard_write_address);
+			keyboard_we, keyboard_write_data, keyboard_write_address,
+			chess_address, chess_data, black_clock, white_clock, winner, winnerEnable);
 	 
 //	 assign temp_we = chess_address == 36 && DEBUG_button_clicked ? 1'b1 : 1'b0;
 //	 assign temp_we = chess_address == 36 && ps2_out == 8'h6B;
@@ -210,7 +215,6 @@ module main(
 	 );
 	 //##########################################END PROCESSOR SKELETON###########################################//
 	
-	
 	// VGA
 	Reset_Delay			r0	(.iCLK(CLOCK_50),.oRESET(DLY_RST)	);
 	VGA_Audio_PLL 		p1	(.areset(~DLY_RST),.inclk0(CLOCK_50),.c0(VGA_CTRL_CLK),.c1(AUD_CTRL_CLK),.c2(VGA_CLK)	);
@@ -223,5 +227,5 @@ module main(
 								 .g_data(VGA_G),
 								 .r_data(VGA_R), 
 								 .chess_address(chess_address_vga),
-								 .chess_data(chess_data));
+								 .chess_data(chess_data), .winnerKB(winner), .winnerEnableKB(winnerEnable), .white_clock(white_clock), .black_clock(black_clock));
 endmodule
