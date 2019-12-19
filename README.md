@@ -1,4 +1,4 @@
-# chessECE350 Final Project Report
+#ECE350 Final Project Report
 === 
 Brandon Guo (blg19)
 Andy Nguyen (aln20)
